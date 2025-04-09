@@ -33,27 +33,32 @@ def create_lerobot_dataset_from_hdf5(args):
         robot_type="franka",
         fps=10,
         features={
-            "image_0":{
+            "observation.image_0":{
                 "dtype": "image",
                 "shape": (480, 480, 3),
                 "names": ["height", "width", "channels"]
             },
-            "image_1":{
+            "observation.image_1":{
                 "dtype": "image",
                 "shape": (480, 480, 3),
                 "names": ["height", "width", "channels"]
             },
-            "image_2":{
+            "observation.image_2":{
                 "dtype": "image",
                 "shape": (480, 480, 3),
                 "names": ["height", "width", "channels"]
             },
-            "image_3":{
+            "observation.image_3":{
                 "dtype": "image",
                 "shape": (480, 480, 3),
                 "names": ["height", "width", "channels"]
             },
-            "image_4":{
+            "observation.image_4":{
+                "dtype": "image",
+                "shape": (480, 480, 3),
+                "names": ["height", "width", "channels"]
+            },
+            "observation.image_wrist":{
                 "dtype": "image",
                 "shape": (480, 480, 3),
                 "names": ["height", "width", "channels"]
@@ -77,6 +82,7 @@ def create_lerobot_dataset_from_hdf5(args):
     tasks = os.listdir(args.dataset_path)
     h5py_files = list()
     for task in tasks:
+        #import pdb;pdb.set_trace()
         h5py_files.extend(get_all_hdf5_files(os.path.join(args.dataset_path, task))[:args.max_files])
     print("File numbers:", len(h5py_files))
     for file in h5py_files:
@@ -99,27 +105,24 @@ def create_lerobot_dataset_from_hdf5(args):
                         action = np.concatenate([action[:6], np.array([0])])
                     dataset.add_frame(
                         {
-                            "observation.image_0": images[i][2], # front camera
-                            "observation.image_1": images[i][3], # wrist camera
-                            "observation.image_2": images[i][0], # left camera
-                            "observation.image_3": images[i][1], # right camera
-                            "observation.image_4": images[i][4], # overhead camera
-                            "observation.state": ee_state[i], 
+                            "observation.image_0": images[i][2], #左低
+                            "observation.image_1": images[i][3], # 左高
+                            "observation.image_2": images[i][0], # 右低
+                            "observation.image_3": images[i][1], # 右高
+                            "observation.image_4": images[i][4], # 正前方
+                            "observation.image_wrist": images[i][5], # 手腕 
+                            "observation.state": ee_state[i],
                             "action": action,
                             
                         }
                     )
-                try:    
-                    dataset.save_episode(task=np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8"))
-                except:
-                    continue
-                    print(f"Error saving episode {file} {timestamp}")
+                dataset.save_episode(task=np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8"))
     dataset.consolidate(run_compute_stats=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a LeRobot dataset")
-    parser.add_argument("--dataset-name", type=str, default="select_fruit_noscene", help="Name of the dataset")
-    parser.add_argument("--dataset-path", type=str, default="/mnt/data/310_jiarui/VLABench/media/select_fruit_none_distractor/select_fruit", help="Path to the dataset")
-    parser.add_argument("--max-files", type=int, default=100, help="Maximum number of files to process")
+    parser.add_argument("--dataset-name", type=str, default="select_fruit_none_distractor_v3_100", help="Name of the dataset")
+    parser.add_argument("--dataset-path", type=str, default="/mnt/data/310_jiarui/VLABench/media/select_fruit_none_distractor", help="Path to the dataset")
+    parser.add_argument("--max-files", type=int, default=20, help="Maximum number of files to process")
     args = parser.parse_args()
     create_lerobot_dataset_from_hdf5(args)

@@ -24,9 +24,9 @@ from dm_control.composer import Task
 os.environ["MUJOCO_GL"] = "egl"
 def get_args():
     parser = argparse.ArgumentParser(description='Generate trajectory for a task')
-    parser.add_argument('--task-name', default="select_fruit", type=str, help='task name')
+    parser.add_argument('--task-name', default="select_chemistry_tube", type=str, help='task name')
     parser.add_argument('--record-video', default=True, help='record video')
-    parser.add_argument('--save-dir', default="/mnt/data/310_jiarui/VLABench/media/select_fruit_none_distractor")
+    parser.add_argument('--save-dir', default="/mnt/data/310_jiarui/VLABench/media/")
     parser.add_argument('--n-sample', default=200, type=int, help='number of samples to generate')
     parser.add_argument('--start-id', default=1, type=int, help='start index for data storage')
     parser.add_argument('--robot', default="franka", type=str, help='robot name')

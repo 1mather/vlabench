@@ -3,34 +3,34 @@
 from VLABench.evaluation.evaluator import Evaluator
 from VLABench.evaluation.model.policy.openvla import OpenVLA
 from VLABench.evaluation.model.policy.base import RandomPolicy
+from VLABench.evaluation.model.policy.client import RemoteAgentClient
 from VLABench.tasks import *
 from VLABench.robots import *
 import transformers
 demo_tasks = ["select_fruit"]
-unseen = True
+unseen = False
 save_dir = "/mnt/data/310_jiarui/VLABench/logs"
 #/home/tyj/Documents/310_jiarui/openvla/log/train_log/openvla-7b+h5py_dataset+b1+lr-0.0005+lora-r8+dropout-0.0
-model_ckpt = "/mnt/data/310_jiarui/VLABench/model_parameter/base/openvla-7b+vlabench_dataset+b80+lr-0.0005+lora-r16+dropout-0.0--time-20250408-13"
-lora_ckpt ="/mnt/data/310_jiarui/VLABench/model_parameter/adapter/openvla-7b+vlabench_dataset+b80+lr-0.0005+lora-r16+dropout-0.0--time-20250408-13"
+# model_ckpt = "/mnt/data/310_jiarui/VLABench/model_parameter/base/openvla-7b+vlabench_dataset+b80+lr-0.0005+lora-r16+dropout-0.0--time-20250408-13"
+# lora_ckpt ="/mnt/data/310_jiarui/VLABench/model_parameter/adapter/openvla-7b+vlabench_dataset+b80+lr-0.0005+lora-r16+dropout-0.0--time-20250408-13"
+
+
 from huggingface_hub import login
 from pathlib import Path
 import os
 os.environ["MUJOCO_GL"] = "egl"
-
-
-
 evaluator = Evaluator(
     tasks=demo_tasks,
-    n_episodes=20,
+    n_episodes=20,     #配置评测次数
     max_substeps=10,   
     save_dir=save_dir,
-    visulization=True
+    visulization=False
 )
+# policy = OpenVLA(
+#     model_ckpt=model_ckpt,
+#     lora_ckpt=lora_ckpt,
+#     norm_config_file=None)
 
-policy = OpenVLA(
-    model_ckpt=model_ckpt,
-    lora_ckpt=lora_ckpt,
-    norm_config_file=None)
-
+policy = RemoteAgentClient()
 result = evaluator.evaluate(policy)
 
