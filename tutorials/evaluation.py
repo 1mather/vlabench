@@ -21,16 +21,12 @@ import os
 os.environ["MUJOCO_GL"] = "egl"
 evaluator = Evaluator(
     tasks=demo_tasks,
-    n_episodes=20,     #配置评测次数
+    n_episodes=500,     #配置评测次数
     max_substeps=10,   
     save_dir=save_dir,
-    visulization=False
+    visulization=True
 )
-# policy = OpenVLA(
-#     model_ckpt=model_ckpt,
-#     lora_ckpt=lora_ckpt,
-#     norm_config_file=None)
 
-policy = RemoteAgentClient()
-result = evaluator.evaluate(policy)
+policy = RemoteAgentClient(model="VQ_BET")
+result = evaluator.evaluate (policy)
 
