@@ -121,8 +121,8 @@ def create_lerobot_dataset_from_hdf5(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a LeRobot dataset")
-    parser.add_argument("--dataset-name", type=str, default="select_fruit_none_distractor_v3_100", help="Name of the dataset")
+    parser.add_argument("--dataset-name", type=str, default="select_fruit_none_distractor_v3_200", help="Name of the dataset")
     parser.add_argument("--dataset-path", type=str, default="/mnt/data/310_jiarui/VLABench/media/select_fruit_none_distractor", help="Path to the dataset")
-    parser.add_argument("--max-files", type=int, default=20, help="Maximum number of files to process")
+    parser.add_argument("--max-files", type=int, default=40, help="Maximum number of files to process")
     args = parser.parse_args()
     create_lerobot_dataset_from_hdf5(args)
