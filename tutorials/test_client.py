@@ -38,25 +38,19 @@ def preprocess_image(image):
     # image_chw = image_chw / 255.0  # 归一化到[0,1]范围
     
     return image_chw
-def send_test_request(image, ee_state):
+def send_test_request(images, ee_state):
     """同步版本的send_test_request函数"""
     # 定义内部异步函数
-    async def _async_send_request(image, ee_state):
-        # 原来的异步代码...
+    async def _async_send_request(images, ee_state):
         uri = "ws://127.0.0.1:8000"
         async with websockets.connect(uri) as websocket:
-            #处理数据并发送
-
-            test_image = np.array(image,dtype=np.float32)
-            # 创建状态向量
-            #state = np.array([0.97, 0.68, 0.77, 0.59, 0.27, 0.70, 0.63], dtype=np.float32)
+            observation = {}
+            for key,value in images.items():
+                observation[key] = np.array(preprocess_image(value),dtype=np.float32)
             state = np.array(ee_state,dtype=np.float32)
             # 创建观察数据，使用正确的键名
-            observation = {
-                "observation.image_0": preprocess_image(test_image),  # 直接使用NumPy数组，不进行编码
-                "observation.state": state
-            }
-
+            observation["observation.state"] = state
+            
 
             packed_data = msgpack_numpy.packb(observation, use_bin_type=True)
             await websocket.send(packed_data)
@@ -89,7 +83,7 @@ def send_test_request(image, ee_state):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     
-    result = loop.run_until_complete(_async_send_request(image, ee_state))
+    result = loop.run_until_complete(_async_send_request(images, ee_state))
     return result  # 返回实际结果，而不是协程
 if __name__ == "__main__":
     try:

@@ -8,6 +8,16 @@ from VLABench.envs import load_env
 from VLABench.utils.utils import euler_to_quaternion
 from scipy.spatial.transform import Rotation as R
 import pdb
+
+OBSERVATION={
+    "observation.image_0":2,
+    "observation.image_1":3,
+    "observation.image_2":0,
+    "observation.image_3":1,
+    "observation.image_4":4,
+    "observation.image_wrist":5,
+}
+
 CAMERA_VIEW_INDEX={
     "select_painting": 1,
     "put_box_on_painting": 1,
@@ -15,7 +25,7 @@ CAMERA_VIEW_INDEX={
     "find_unseen_object":2,
     "texas_holdem": 2,
     "cluster_toy": 2,
-    "select_fruit":2
+    "select_fruit":2,
 }
 def quat2euler(quat, is_degree=False):
     r = R.from_quat([quat[1], quat[2], quat[3], quat[0]])
@@ -65,6 +75,11 @@ class Evaluator:
         if self.save_dir is not None:
             os.makedirs(self.save_dir, exist_ok=True)
         self.visulization = visulization
+
+        if kwargs.get("observation_images",None) is not None:
+            self.observation_images = kwargs["observation_images"]
+        else:
+            self.observation_images = None
         
     def evaluate(self, agent):
         """
@@ -126,10 +141,16 @@ class Evaluator:
             observation = env.get_observation()
             observation["instruction"] = env.task.get_instruction()
             if self.save_dir is not None and self.visulization:
-                frames_to_save.append(observation["rgb"])
-                cam_index = CAMERA_VIEW_INDEX.get(task_name, 0)
+                frames_to_save.append(np.vstack([np.hstack(observation["rgb"][:2]), np.hstack(observation["rgb"][2:4]),np.hstack(observation["rgb"][4:6])]))
+                
+                cam_index = CAMERA_VIEW_INDEX.get(task_name)
+                if self.observation_images is not None:
+                    cam_index = [OBSERVATION.get(img) for img in self.observation_images]
 
-                view_of_model.append(observation["rgb"][cam_index])
+                indices = cam_index if isinstance(cam_index, list) else [cam_index]
+                view_of_model_frame=[observation["rgb"][idx] for idx in indices]
+
+                view_of_model.append(np.vstack(view_of_model_frame))
             if agent.control_mode == "ee":
                 #pdb.set_trace()
                 #但是注意这里输出的应该是delta_action, 具体实现在VLABench/evaluation/model/policy/Openvla.py
@@ -146,8 +167,11 @@ class Evaluator:
                     ee_pos -= np.array([0, -0.4, 0.78])
                     print(ee_pos,ee_euler,gripper)
                     ee_state = np.concatenate([ee_pos, ee_euler, gripper], axis=0)
+                    observation_images_tosend = {}
+                    for img in self.observation_images:
+                        observation_images_tosend[img] = observation["rgb"][OBSERVATION[img]]
                     try:
-                        pos, euler, gripper_state, view_index = send_test_request(observation["rgb"][cam_index],ee_state)
+                        pos, euler, gripper_state, view_index = send_test_request(observation_images_tosend,ee_state)
                     except Exception as e:
                         continue
                 else:
