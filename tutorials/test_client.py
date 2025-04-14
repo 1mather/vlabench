@@ -60,7 +60,10 @@ def send_test_request(images, ee_state):
             try:
                 unpacked_response = msgpack_numpy.unpackb(response, raw=False)
                 logging.info(f"Received msgpack response: {unpacked_response}")
-                action = unpacked_response[0]
+                if len(unpacked_response) == 1:
+                    action = unpacked_response[0]
+                else:
+                    action = unpacked_response
                 target_pos = action[:3]+np.array([0, -0.4, 0.78]) 
                 target_euler = action[3:6]
                 gripper_open = action[-1]
