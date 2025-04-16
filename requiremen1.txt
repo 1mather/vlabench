@@ -22,5 +22,5 @@ colorama
 peft
 asyncio
 websockets
-cv2
+#cv2
 msgpack_numpy

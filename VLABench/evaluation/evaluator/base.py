@@ -137,7 +137,8 @@ class Evaluator:
                 """
                 这里可以添加多个接口用于测评不同的模型
                 """
-                from tutorials.test_client import send_test_request
+                # from tutorials.test_client import send_test_request
+                from test_yjj.test_client_yjj import send_test_request
                 from VLABench.evaluation.model.policy.client import RemoteAgentClient
                 if isinstance(agent, RemoteAgentClient):
                     ee_state = observation["ee_state"]

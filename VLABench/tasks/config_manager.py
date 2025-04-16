@@ -238,6 +238,7 @@ class BenchTaskConfigManager():
                                                         "apple",
                                                         position=selected_position,
                                                         randomness=None  # 禁用随机性
+                                                        # randomness=DEFAULT_RABDOMNESS  # 禁用随机性
                                                     )
             elif object=="plate_seen":
                 import pdb
