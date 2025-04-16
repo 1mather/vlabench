@@ -22,12 +22,17 @@ os.environ["MUJOCO_GL"] = "egl"
 evaluator = Evaluator(
     tasks=demo_tasks,
     n_episodes=500,     #配置评测次数
+    episode_config="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_config.json",
     max_substeps=10,   
     save_dir=save_dir,
     visulization=True,
-    observation_images=["observation.image_0","observation.image_1"]  # 可以传入任意的image，但请与训练的时候保持一致。
+    observation_images=["observation.image_0"]  # 可以传入任意的image，但请与训练的时候保持一致。
 )
-
+"""
+现有的输入
+observation.image_
+observation.state
+"""
 policy = RemoteAgentClient(model="VQ_BET")
 result = evaluator.evaluate (policy)
 

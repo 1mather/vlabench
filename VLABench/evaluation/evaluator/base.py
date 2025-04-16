@@ -62,7 +62,7 @@ class Evaluator:
         if self.episode_config is None:
             print("Load the task episodes by seeds, instead of episodes")
         else:
-            assert len(self.episode_config) >= len(n_episodes), "The number of episodes should be less than the number of configurations"
+            Warning(f"The number of episodes should be less than the number of configurations, {len(self.episode_config)} >= {n_episodes}")
         self.eval_tasks = tasks
         self.n_episodes = n_episodes 
         
@@ -97,7 +97,7 @@ class Evaluator:
                 if self.episode_config is None: 
                     info,obs = self.evaluate_single_episode(agent, task, i, None, seed=42+i, **kwargs)
                 else: 
-                    info,obs= self.evaluate_single_episode(agent, task, i, self.episode_config[i], **kwargs)
+                    info,obs= self.evaluate_single_episode(agent, task, i, self.episode_config, **kwargs)
                 if obs["instruction"] is not None:
                     print(obs["instruction"])
                 else:
@@ -141,8 +141,28 @@ class Evaluator:
             observation = env.get_observation()
             observation["instruction"] = env.task.get_instruction()
             if self.save_dir is not None and self.visulization:
-                frames_to_save.append(np.vstack([np.hstack(observation["rgb"][:2]), np.hstack(observation["rgb"][2:4]),np.hstack(observation["rgb"][4:6])]))
                 
+                frame_width=observation["rgb"][0].shape[1]
+                frame_height=observation["rgb"][0].shape[0]
+                # 将所有帧堆叠到一个大图像中
+                num_cols = 2
+                num_rows = 3
+                stacked_image = np.zeros((frame_height * num_rows, frame_width * num_cols, 3), dtype=np.uint8)
+                for i, frame in enumerate(observation["rgb"]):
+                    row = i // num_cols
+                    col = i % num_cols
+                    y1 = row * frame_height
+                    y2 = y1 + frame_height
+                    x1 = col * frame_width
+                    x2 = x1 + frame_width
+                    
+                    # 确保尺寸一致
+
+                    
+                    # 复制到堆叠图像中
+                    stacked_image[y1:y2, x1:x2] = frame               
+                # 写入堆叠后的帧
+                frames_to_save.append(stacked_image)
                 cam_index = CAMERA_VIEW_INDEX.get(task_name)
                 if self.observation_images is not None:
                     cam_index = [OBSERVATION.get(img) for img in self.observation_images]
