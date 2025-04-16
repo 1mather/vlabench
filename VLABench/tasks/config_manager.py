@@ -150,7 +150,8 @@ class BenchTaskConfigManager():
                 xml_path = xml_path[0]
             elif name == "plate_seen":
                 if self.config["task"]["xml_path"] is not None:
-                    xml_path = self.config["task"]["xml_path"]
+                    xml_path = xml_path[self.config["task"]["xml_path"]]
+                    print("xml_path是",xml_path)
                 else:  
                     xml_path = xml_path[8]
             else:
