@@ -149,12 +149,13 @@ class BenchTaskConfigManager():
             elif name == "orange":
                 xml_path = xml_path[0]
             elif name == "plate_seen":
-                xml_path = xml_path[8]
+                if self.config["task"]["xml_path"] is not None:
+                    xml_path = self.config["task"]["xml_path"]
+                else:  
+                    xml_path = xml_path[8]
             else:
                 xml_path = xml_path[0]
                 print("名字是", name)
-
-
         print("xml_path是",xml_path)
         entity_config = dict(
             name=name,

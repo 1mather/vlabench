@@ -85,6 +85,7 @@
 
     "select_fruit_series":{
         "task":{
+            "xml_path": 8,
             "ngrid": [10, 10],
             "random_ignored_entities": ["banana","pear","plate_seen","apple"],
             "asset":{
