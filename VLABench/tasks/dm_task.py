@@ -47,7 +47,7 @@ class LM4ManipBaseTask(composer.Task):
             episode_config: deterministic configuration for task building
         """
         self.task_name = task_name
-        self.config_manager = register.load_config_manager(task_name)(task_name)
+        self.config_manager = register.load_config_manager(task_name)(task_name,config=kwargs["config"])
         self.asset_path = os.path.join(os.getenv("VLABENCH_ROOT"), "assets") 
         self.use_llm = use_llm       
         self._arena = composer.Arena(xml_path=os.path.join(self.asset_path, "base/default.xml"))

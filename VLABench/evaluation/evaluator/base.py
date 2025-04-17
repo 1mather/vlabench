@@ -8,6 +8,7 @@ from VLABench.envs import load_env
 from VLABench.utils.utils import euler_to_quaternion
 from scipy.spatial.transform import Rotation as R
 import pdb
+import copy
 
 OBSERVATION={
     "observation.image_0":2,
@@ -87,6 +88,9 @@ class Evaluator:
         """   
         metrics = {}
         instruction={}
+        # 创建 episode_config 的深拷贝
+        episode_config_copy = copy.deepcopy(self.episode_config) if self.episode_config is not None else None
+        
         for task in self.eval_tasks:
             task_infos = []
             instructions=[]
@@ -94,10 +98,12 @@ class Evaluator:
                 kwargs = {
                     "unnorm_key": task
                 }
-                if self.episode_config is None: 
+                if episode_config_copy is None:
                     info,obs = self.evaluate_single_episode(agent, task, i, None, seed=42+i, **kwargs)
                 else: 
-                    info,obs= self.evaluate_single_episode(agent, task, i, self.episode_config, **kwargs)
+                    # 为每个评估创建新的深拷贝
+                    config_for_episode = copy.deepcopy(episode_config_copy)
+                    info,obs= self.evaluate_single_episode(agent, task, i, config_for_episode, **kwargs)
                 if obs["instruction"] is not None:
                     print(obs["instruction"])
                 else:
