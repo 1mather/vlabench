@@ -32,12 +32,15 @@ def get_args():
     parser.add_argument('--robot', default="franka", type=str, help='robot name')
     parser.add_argument('--debug', action="store_true", default=False, help='debug mode')
     parser.add_argument('--early-stop', action="store_true", default=False, help='whether use early stop when skill failed to carry out')
+    parser.add_argument('--config-path', default="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/task_config_1_pos_700.json", type=str, help='policy path')
+
     args = parser.parse_args()
     return args
 
 
 def generate_trajectory(args, index, logger):
-    env = load_env(args.task_name, robot=args.robot)
+    config = json.load(open(args.config_path, "r"))
+    env = load_env(args.task_name, robot=args.robot, config=config)
     env.reset()
     
     # load key prior information and task specific variables
@@ -48,10 +51,8 @@ def generate_trajectory(args, index, logger):
         entities=list(env.task.entities.keys()),
         instruction=[instruction],
     )
-    
     # register the expert sequence
     skill_seq = env.get_expert_skill_sequence()
-
     # start auto trajectory generation
     observations, waypoints= [], []
     if skill_seq is not None: # normal case
@@ -69,7 +70,6 @@ def generate_trajectory(args, index, logger):
                 break
     else: # TODO: some special tasks should be handled based on the feedback
         raise NotImplementedError("No expert skill sequence found")
-    
     task_dir = os.path.join(args.save_dir, args.task_name)
     #保存视频
     if args.record_video:
