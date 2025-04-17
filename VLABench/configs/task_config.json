@@ -85,8 +85,9 @@
 
     "select_fruit_series":{
         "task":{
+            "xml_path": 5,
             "ngrid": [10, 10],
-            "random_ignored_entities": ["banana","pear","plate_seen"],
+            "random_ignored_entities": ["banana","pear","plate_seen","apple"],
             "asset":{
                 "seen_object":["apple", "banana", "orange"],   
                 "unseen_object":[],
@@ -94,6 +95,13 @@
                 "unseen_container":["plate_unseen"],
                 "seen_init_container":["tray_seen"],
                 "unseen_init_container":["tray_unseen"]
+            },
+            "deterministic":true,
+            "target_entity":"apple",
+            "initial_pose":{
+                "apple_positions": [
+                    [-0.2, 0.18, 0.8]
+                ]
             },
             "components":[
                 {
