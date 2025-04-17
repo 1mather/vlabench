@@ -4,7 +4,7 @@ from VLABench.utils.register import register
 from VLABench.envs.dm_env import LM4ManipDMEnv
 from VLABench.configs import name2config
 from VLABench.utils.utils import find_key_by_value
-
+import copy
 # load global robot config here, corresponding to different embodiments
 with open(os.path.join(os.getenv("VLABENCH_ROOT"), "configs/robot_config.json"), "r") as f:
     ROBOT_CONFIG= json.load(f)
@@ -24,12 +24,13 @@ def load_env(task, robot="franka", config=None, time_limit=float('inf'), reset_w
     """
     # load config
     #1.加载任务配置
+    import copy
     task_series = find_key_by_value(name2config, task)
-    specific_config = TASK_CONFIG.get(task_series, {})
-    default_config = TASK_CONFIG["default"]
+    specific_config = copy.deepcopy(config.get(task_series, {}))
+    default_config = copy.deepcopy(TASK_CONFIG["default"])
     default_config.update(specific_config)
-    if config is not None and isinstance(config, dict):
-        default_config.update(config)
+    # if config is not None and isinstance(config, dict):
+    #     default_config.update(config)
     # load and update robot config first and then load robot entity
     #2.加载机器人配置
     robot_config = ROBOT_CONFIG.get(robot, None)

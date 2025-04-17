@@ -89,7 +89,7 @@ class Evaluator:
         metrics = {}
         instruction={}
         # 创建 episode_config 的深拷贝
-        episode_config_copy = copy.deepcopy(self.episode_config) if self.episode_config is not None else None
+       
         
         for task in self.eval_tasks:
             task_infos = []
@@ -98,6 +98,7 @@ class Evaluator:
                 kwargs = {
                     "unnorm_key": task
                 }
+                episode_config_copy = copy.deepcopy(self.episode_config) if self.episode_config is not None else None
                 if episode_config_copy is None:
                     info,obs = self.evaluate_single_episode(agent, task, i, None, seed=42+i, **kwargs)
                 else: 
@@ -144,6 +145,7 @@ class Evaluator:
         frames_to_save = []
         view_of_model=[]
         for i in range(max_episode_length):
+        #for i in range(1):
             observation = env.get_observation()
             observation["instruction"] = env.task.get_instruction()
             if self.save_dir is not None and self.visulization:
