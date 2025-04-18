@@ -39,6 +39,8 @@ def get_args():
 
 
 def generate_trajectory(args, index, logger):
+
+    #here load the confg of tasks
     config = json.load(open(args.config_path, "r"))
     env = load_env(args.task_name, robot=args.robot, config=config)
     env.reset()
