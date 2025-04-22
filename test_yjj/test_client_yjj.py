@@ -9,6 +9,8 @@ import sys
 import msgpack_numpy
 import msgpack
 import torch
+import image_tools
+
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
@@ -38,25 +40,21 @@ def preprocess_image(image):
     # image_chw = image_chw / 255.0  # 归一化到[0,1]范围
     
     return image_chw
-def send_test_request(image, ee_state):
+def send_test_request(client, images, ee_state, instruction):
     """同步版本的send_test_request函数"""
     # 定义内部异步函数
-    async def _async_send_request(image, ee_state):
-        # 原来的异步代码...
-        uri = "ws://127.0.0.1:8000"
+    async def _async_send_request(images, ee_state, instruction):
+        # uri = "ws://127.0.0.1:8000"
+        uri = "ws://0.0.0.0:8000"
         async with websockets.connect(uri) as websocket:
-            #处理数据并发送
-
-            test_image = np.array(image,dtype=np.float32)
-            # 创建状态向量
-            #state = np.array([0.97, 0.68, 0.77, 0.59, 0.27, 0.70, 0.63], dtype=np.float32)
+            observation = {}
+            for key,value in images.items():
+                observation[key] = image_tools.resize_with_pad(value, 224, 224)
             state = np.array(ee_state,dtype=np.float32)
             # 创建观察数据，使用正确的键名
-            observation = {
-                "observation.image_0": preprocess_image(test_image),  # 直接使用NumPy数组，不进行编码
-                "observation.state": state
-            }
-
+            observation["observation/state"] = state
+            observation["prompt"] = instruction
+            
 
             packed_data = msgpack_numpy.packb(observation, use_bin_type=True)
             await websocket.send(packed_data)
@@ -66,7 +64,10 @@ def send_test_request(image, ee_state):
             try:
                 unpacked_response = msgpack_numpy.unpackb(response, raw=False)
                 logging.info(f"Received msgpack response: {unpacked_response}")
-                action = unpacked_response[0]
+                if len(unpacked_response) == 1:
+                    action = unpacked_response[0]
+                else:
+                    action = unpacked_response
                 target_pos = action[:3]+np.array([0, -0.4, 0.78]) 
                 target_euler = action[3:6]
                 gripper_open = action[-1]
@@ -89,8 +90,21 @@ def send_test_request(image, ee_state):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     
-    result = loop.run_until_complete(_async_send_request(image, ee_state))
+    result = loop.run_until_complete(_async_send_request(images, ee_state, instruction))
     return result  # 返回实际结果，而不是协程
+
+def send_test_request(client, images, ee_state, instruction):
+    observation = {}
+    for key,value in images.items():
+        observation[key] = image_tools.resize_with_pad(value, 224, 224)
+    state = np.array(ee_state,dtype=np.float32)
+    # 创建观察数据，使用正确的键名
+    observation["observation/state"] = state
+    observation["prompt"] = instruction
+    # Query model to get action
+    action_chunk = client.infer(observation)["actions"]
+    return action_chunk
+
 if __name__ == "__main__":
     try:
         result = asyncio.run(send_test_request())

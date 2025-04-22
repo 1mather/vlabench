@@ -8,14 +8,24 @@ from VLABench.envs import load_env
 from VLABench.utils.utils import euler_to_quaternion
 from scipy.spatial.transform import Rotation as R
 import pdb
+import collections
+
+# OBSERVATION={
+#     "observation.image_0":2,
+#     "observation.image_1":3,
+#     "observation.image_2":0,
+#     "observation.image_3":1,
+#     "observation.image_4":4,
+#     "observation.image_wrist":5,
+# }
 
 OBSERVATION={
-    "observation.image_0":2,
-    "observation.image_1":3,
-    "observation.image_2":0,
-    "observation.image_3":1,
-    "observation.image_4":4,
-    "observation.image_wrist":5,
+    "observation/image_0":2,
+    "observation/image_1":3,
+    "observation/image_2":0,
+    "observation/image_3":1,
+    "observation/image":4,
+    "observation/wrist_image":5,
 }
 
 CAMERA_VIEW_INDEX={
@@ -81,7 +91,7 @@ class Evaluator:
         else:
             self.observation_images = None
         
-    def evaluate(self, agent):
+    def evaluate(self, agent, client):
         """
         Evaluate the agent on all tasks defined in the evaluator.
         """   
@@ -95,9 +105,9 @@ class Evaluator:
                     "unnorm_key": task
                 }
                 if self.episode_config is None: 
-                    info,obs = self.evaluate_single_episode(agent, task, i, None, seed=42+i, **kwargs)
+                    info,obs = self.evaluate_single_episode(agent, client, task, i, None, seed=42+i, **kwargs)
                 else: 
-                    info,obs= self.evaluate_single_episode(agent, task, i, self.episode_config[i], **kwargs)
+                    info,obs= self.evaluate_single_episode(agent, client, task, i, self.episode_config[i], **kwargs)
                 if obs["instruction"] is not None:
                     print(obs["instruction"])
                 else:
@@ -116,7 +126,7 @@ class Evaluator:
                 json.dump(instruction, f)
         return metrics
         
-    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=200, **kwargs):
+    def evaluate_single_episode(self, agent, client, task_name, episode_id, episode_config, seed=42, max_episode_length=200, **kwargs):
         """
         If episode_config is given, the task and scene will load deterministically.
         params:
@@ -137,6 +147,7 @@ class Evaluator:
         info = {}
         frames_to_save = []
         view_of_model=[]
+        action_plan = collections.deque()
         for i in range(max_episode_length):
             observation = env.get_observation()
             observation["instruction"] = env.task.get_instruction()
@@ -146,7 +157,9 @@ class Evaluator:
                 cam_index = CAMERA_VIEW_INDEX.get(task_name)
                 if self.observation_images is not None:
                     cam_index = [OBSERVATION.get(img) for img in self.observation_images]
-
+                
+                view_index = ''.join(map(str, cam_index))
+                
                 indices = cam_index if isinstance(cam_index, list) else [cam_index]
                 view_of_model_frame=[observation["rgb"][idx] for idx in indices]
 
@@ -171,13 +184,20 @@ class Evaluator:
                     observation_images_tosend = {}
                     for img in self.observation_images:
                         observation_images_tosend[img] = observation["rgb"][OBSERVATION[img]]
-                    try:
-                        pos, euler, gripper_state, view_index = send_test_request(observation_images_tosend,ee_state)
-                    except Exception as e:
-                        continue
+                    # try:
+                    if not action_plan:
+                        action_chunk = send_test_request(client, observation_images_tosend,ee_state, observation["instruction"])
+                        action_plan.extend(action_chunk[:8])
+                    # except Exception as e:
+                        # continue
                 else:
                     pos, euler, gripper_state, view_index = agent.predict(observation, **kwargs)
+                cur_action = action_plan.popleft()
+                pos, euler, gripper_open = cur_action[:3], cur_action[3:6], cur_action[-1]
+                gripper_state = np.ones(2)*0.04 if gripper_open >= 0.2 else np.zeros(2)
                 quat = euler_to_quaternion(*euler)
+                pos = np.array(pos, copy=True)
+                pos += np.array([0, -0.4, 0.78])
                 action = env.robot.get_qpos_from_ee_pos(physics=env.physics, pos=pos, quat=quat)[:7]#delta关节角度
                 action = np.concatenate([action, gripper_state])
             elif agent.control_mode == "joint":
@@ -213,9 +233,9 @@ class Evaluator:
             os.makedirs(os.path.join(self.save_dir, agent.name, task_name), exist_ok=True)
             episode_id=str(episode_id)+"view"+str(view_index)
             if success:
-                self.save_video(frames_to_save, os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}_success.mp4"))
+                self.save_frames_to_video(frames_to_save, os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}_success.mp4"))
             else:
-                self.save_video(frames_to_save, os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}_fail.mp4"))
+                self.save_frames_to_video(frames_to_save, os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}_fail.mp4"))
             mediapy.write_video(os.path.join(self.save_dir, agent.name, task_name, f"{episode_id}_view_of_model.mp4"),view_of_model, fps=10) 
         return info,observation
         
@@ -249,3 +269,7 @@ class Evaluator:
             frames_to_save.append(np.vstack([np.hstack(frame[:2]), np.hstack(frame[2:4])]))
         mediapy.write_video(save_dir, 
                             frames_to_save, fps=10) 
+        
+    def save_frames_to_video(self, frames, save_dir):
+        mediapy.write_video(save_dir, 
+                            frames, fps=10) 

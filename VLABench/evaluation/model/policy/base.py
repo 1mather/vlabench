@@ -25,7 +25,7 @@ class Policy:
     
     @property
     def name(self):
-        return "Policy"
+        return self.model
     
     @property
     def control_mode(self):

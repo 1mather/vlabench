@@ -29,5 +29,5 @@ evaluator = Evaluator(
 )
 
 policy = RemoteAgentClient(model="VQ_BET")
-result = evaluator.evaluate (policy)
+result = evaluator.evaluate(policy)
 
