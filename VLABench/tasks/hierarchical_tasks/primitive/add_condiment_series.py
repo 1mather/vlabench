@@ -18,7 +18,8 @@ class AddCondimentConfigManager(BenchTaskConfigManager):
     
     def load_containers(self, target_container):
         stove_config = self.get_entity_config("stove", position=[0.1, 0, 0], randomness=None)
-        container_config = self.get_entity_config(target_container, position=[random.uniform(-0.2, -0.1), random.uniform(-0.2, 0.), 0.84], randomness=None)
+        #container_config = self.get_entity_config(target_container, position=[random.uniform(-0.2, -0.1), random.uniform(-0.2, 0.), 0.84], randomness=None)
+        container_config= self.get_entity_config(target_container, position=[-0.15, -0.1, 0.84], randomness=None)
         container_config["subentities"] = [self.get_entity_config("dishes", position=[0, 0.03, 0.0], randomness=None)]
         self.config["task"]["components"].append(stove_config)
         self.config["task"]["components"].append(container_config)
@@ -44,15 +45,19 @@ class AddCondimentConfigManager(BenchTaskConfigManager):
         objects.append(target_entity)
         other_objects = flatten_list(self.seen_object) + flatten_list(self.unseen_object)
         other_objects.remove(target_entity)
-        objects.extend(random.sample(other_objects, self.num_object-1))
+        #objects.extend(random.sample(other_objects, self.num_object-1)
         random.shuffle(objects)
         for i, object in enumerate(objects):
             if target_entity == object:
                 self.space_order = i + 1
+            # object_config = self.get_entity_config(object, 
+            #                                        position=[random.uniform(0.15, 0.2), 
+            #                                                  -0.15+0.15*i, 
+            #                                                  0.85])
+            initial_pos=self.config["task"]["initial_pose"].get("bbq_sauce_positions",[[0.2,0,0.85]])
+            initial_pos=random.sample(initial_pos,1)
             object_config = self.get_entity_config(object, 
-                                                   position=[random.uniform(0.15, 0.2), 
-                                                             -0.15+0.15*i, 
-                                                             0.85])
+                                                    position=initial_pos)
             if object in SHAKER_INGRADIENTS:
                 nametag_config = dict(
                     name=f"{object}_tag",

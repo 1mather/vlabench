@@ -149,6 +149,8 @@ class BenchTaskConfigManager():
             """
             if name == "apple":
                 xml_path = xml_path[1]
+            elif name=="stove":
+                xml_path= xml_path[2]
             elif name == "banana":
                 xml_path = xml_path[3]
             elif name == "orange":
@@ -233,20 +235,20 @@ class BenchTaskConfigManager():
         apple_positions=self.config["task"]["initial_pose"]["apple_positions"]
 
         for i, object in enumerate(objects):
-            if object=="apple":
+            if object==target_entity:
                 selected_position =random.choice(apple_positions)
                 if self.config["task"]["deterministic"]==True:
-                    print("生成固定appple")
+                    print("生成固定target_entity")
                     object_config = self.get_entity_config(
-                                                        "apple",
+                                                        target_entity,
                                                         position=selected_position,
                                                         randomness=None  # this randomness was usefull only when the object is not in "ignored randomness" in task_config
                                                                          # if the randomness was set None, the object will randomly appear in the 4 positions in the desk.
                                                     )
                 else:
-                    print("生成随机appple")
+                    print("生成随机target_entity")
                     object_config = self.get_entity_config(
-                                                        "apple",
+                                                        target_entity,
                                                         position=selected_position,
                                                         randomness=DEFAULT_RABDOMNESS  # this randomness was usefull only when the object is not in "ignored randomness" in task_config
                     )

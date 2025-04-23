@@ -69,8 +69,6 @@ def send_test_request(images, ee_state):
                 gripper_open = action[-1]
                 gripper_state = np.ones(2)*0.04 if gripper_open >= 0.2 else np.zeros(2)
                 view_index = 0
-                print(f"the current pose is {observation['observation.state']}")
-                print(f"the target pose is {target_pos},{target_euler},{gripper_state}")
                 # 解析响应...
                 return target_pos, target_euler, gripper_state, view_index
             except Exception as e:

@@ -24,15 +24,15 @@ from dm_control.composer import Task
 os.environ["MUJOCO_GL"] = "egl"
 def get_args():
     parser = argparse.ArgumentParser(description='Generate trajectory for a task')
-    parser.add_argument('--task-name', default="select_fruit", type=str, help='task name')
+    parser.add_argument('--task-name', default="add_condiment", type=str, help='task name')
     parser.add_argument('--record-video', default=True, help='record video')
-    parser.add_argument('--save-dir', default="/mnt/data/310_jiarui/VLABench/media/select_fruit_none_randomness")
-    parser.add_argument('--n-sample', default=500, type=int, help='number of samples to generate')
+    parser.add_argument('--save-dir', default="/mnt/data/310_jiarui/VLABench/media/add_condiment_4_800")
+    parser.add_argument('--n-sample', default=800, type=int, help='number of samples to generate')
     parser.add_argument('--start-id', default=1, type=int, help='start index for data storage')
     parser.add_argument('--robot', default="franka", type=str, help='robot name')
     parser.add_argument('--debug', action="store_true", default=False, help='debug mode')
     parser.add_argument('--early-stop', action="store_true", default=False, help='whether use early stop when skill failed to carry out')
-    parser.add_argument('--config-path', default="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/task_config_1_pos_700.json", type=str, help='policy path')
+    parser.add_argument('--config-path', default="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/add_condiment/task_config_4_pos_800.json", type=str, help='policy path')
 
     args = parser.parse_args()
     return args
@@ -77,7 +77,8 @@ def generate_trajectory(args, index, logger):
     if args.record_video:
         frames = [] 
         for o in observations:
-            frames.append(np.vstack([np.hstack(o["rgb"][:2]), np.hstack(o["rgb"][2:4])]))
+            frames.append(np.vstack([np.hstack(o["rgb"][:2]), np.hstack(o["rgb"][2:4]),np.hstack(o["rgb"][4:6])] ))
+            
         if not os.path.exists(task_dir):
             os.makedirs(task_dir)
         mediapy.write_video(os.path.join(task_dir, f"demo_{index}_success_{task_success}.mp4"), 
