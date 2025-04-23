@@ -7,7 +7,7 @@ import os
 from VLABench.tasks.components.container import CommonContainer, FlatContainer, ContainerWithDoor
 from VLABench.utils.register import register
 
-MATERIALS = ["wood0", "wood1", "wood2", "wood3", "wood4", "stone0", "stone", "stone2", "stone3", "stone4","white0"]
+MATERIALS = ["wood0", "wood1", "wood2", "wood3", "wood4", "stone0", "stone", "stone2", "stone3", "stone4"]
 
 @register.add_entity("Table")
 class Table(FlatContainer):
