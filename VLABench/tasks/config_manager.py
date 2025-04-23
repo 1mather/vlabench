@@ -29,24 +29,29 @@ class BenchTaskConfigManager():
         param:
             config: base config from yaml file
         """
+        config=kwargs["config"]
         # default config
-        self.config = dict(
-            task=dict(
-                ngrid=[10, 10],
-                n_distractor=1,
-                workspace=[-0.3, 0.3, -0.2, 0.2, 0.8, 1.5]
-            )
-        )
-        # load additional config from task_config.json
-        with open(os.path.join(os.getenv("VLABENCH_ROOT"), "configs/task_config.json"), "r") as f:
-            configs = json.load(f)
+        # self.config = dict(
+        #     task=dict(
+        #         ngrid=[10, 10],
+        #         n_distractor=1,
+        #         workspace=[-0.3, 0.3, -0.2, 0.2, 0.8, 1.5]
+        #     )
+        # )
+        # # load additional config from task_config.json
+        # if kwargs.get("config", None) is not None:
+        #     configs = kwargs.get("config")
+        # else:
+        #     config_path = os.path.join(os.getenv("VLABENCH_ROOT"), "configs/task_config.json")
+        #     with open(config_path, "r") as f:
+        #         configs = json.load(f)
 
-        config = configs.get("default", {})#获取默认配置
-        config.update(configs.get(find_key_by_value(name2config, task_name), None))#更新任务特定配置
+        #config = configs.get("default", {})#获取默认配置
+        #config.update(configs.get(find_key_by_value(name2config, task_name), None))#更新任务特定配置
         
         if config is None: 
             raise ValueError(f"Task {task_name} is invalid. Check the valid ones task_config.json file.")
-        self.config.update(config)
+        self.config=config
         if "components" not in self.config["task"]:
             self.config["task"]["components"] = []
         # init assets config
@@ -85,7 +90,8 @@ class BenchTaskConfigManager():
                                         init_container=init_container,
                                         **self.kwargs)
         else:
-            target_entity="apple"
+            #target_entity="apple"
+            target_entity=self.config["task"]["target_entity"]
             if self.seen_container is not None:
                 container = random.choice(self.seen_container)
             else:
@@ -148,12 +154,14 @@ class BenchTaskConfigManager():
             elif name == "orange":
                 xml_path = xml_path[0]
             elif name == "plate_seen":
-                xml_path = xml_path[5]
+                if self.config["task"]["xml_path"] is not None:
+                    xml_path = xml_path[self.config["task"]["xml_path"]]
+                    print("xml_path是",xml_path)
+                else:  
+                    xml_path = xml_path[8]
             else:
                 xml_path = xml_path[0]
                 print("名字是", name)
-
-
         print("xml_path是",xml_path)
         entity_config = dict(
             name=name,
@@ -221,30 +229,33 @@ class BenchTaskConfigManager():
         self.other_objects = flatten_list(self.seen_object) + flatten_list(self.unseen_object)
         self.other_objects.remove(target_entity)
         objects.extend(random.sample(self.other_objects, self.num_object-1))
-        banana_positions = [
-        [-0.2, 0.18, 0.8],  # 左边位置
-        [0.0, 0.18, 0.8],   # 中间位置
-        [0.2, 0.18, 0.8]    # 右边位置
-        ]
-        apple_positions = [
-        [-0.2, 0.18, 0.8],  # 左边位置
-        ]
 
-    
+        apple_positions=self.config["task"]["initial_pose"]["apple_positions"]
+
         for i, object in enumerate(objects):
             if object=="apple":
-                selected_position = random.choice(apple_positions)
-                object_config = self.get_entity_config(
+                selected_position =random.choice(apple_positions)
+                if self.config["task"]["deterministic"]==True:
+                    print("生成固定appple")
+                    object_config = self.get_entity_config(
                                                         "apple",
                                                         position=selected_position,
-                                                        randomness=None  # 禁用随机性
+                                                        randomness=None,  # 禁用随机性
                                                         # randomness=DEFAULT_RABDOMNESS  # 禁用随机性
                                                     )
+                else:
+                    print("生成随机appple")
+                    object_config = self.get_entity_config(
+                                                        "apple",
+                                                        position=selected_position,
+                                                        randomness=DEFAULT_RABDOMNESS  # this randomness was usefull only when the object is not in "ignored randomness" in task_config
+                    )
             elif object=="plate_seen":
                 import pdb
                 pdb.set_trace()
                 object_config = self.get_entity_config(object, position=[0.2, 0.17, 0.8],randomness=None)
             else:
+                print(f"生成随机物体{object}")
                 object_config = self.get_entity_config(object, position=[-0.1+i*0.1, 0.2, 0.79],randomness=DEFAULT_RABDOMNESS)
             self.config["task"]["components"].append(object_config)
     

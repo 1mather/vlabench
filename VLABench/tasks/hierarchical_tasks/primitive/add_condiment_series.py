@@ -44,7 +44,7 @@ class AddCondimentConfigManager(BenchTaskConfigManager):
         objects.append(target_entity)
         other_objects = flatten_list(self.seen_object) + flatten_list(self.unseen_object)
         other_objects.remove(target_entity)
-        objects.extend(random.sample(other_objects, self.num_object-1))
+        # objects.extend(random.sample(other_objects, self.num_object-1))   # FIXEME
         random.shuffle(objects)
         for i, object in enumerate(objects):
             if target_entity == object:

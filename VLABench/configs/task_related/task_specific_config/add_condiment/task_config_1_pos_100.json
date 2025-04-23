@@ -120,11 +120,19 @@
     
     "add_condiment_series":{
         "task":{
+            "xml_path": 8,
+            "target_entity":"bbq_sauce",
             "asset":{
-                "seen_object":["bbq_sauce", "ketchup", "salt"], 
-                "unseen_object":["salad_dressing", "hotsauce", "sugar"],
+                "seen_object":["bbq_sauce"], 
+                "unseen_object":[],
                 "seen_container":["pan_seen"],
                 "unseen_container":["pan_unseen"]
+            },
+            "deterministic":true,
+            "initial_pose":{
+                "bbq_sauce_positions": [
+                    [0.2, 0, 0.85]
+                ]
             },
             "components":[
                 {
