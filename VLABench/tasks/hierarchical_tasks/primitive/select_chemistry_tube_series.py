@@ -13,12 +13,15 @@ relative_row_pos = [-0.05, 0.05]
 class SelectChemistryTubeConfigManager(BenchTaskConfigManager):
     def __init__(self, 
                  task_name,
-                 num_objects=[2, 3],
+                 num_objects=[1],
                  **kwargs):
         super().__init__(task_name, num_objects, **kwargs)
     
     def load_init_containers(self, init_container):
-        init_container_config = self.get_entity_config(init_container, position=[random.uniform(-0.2, 0.2), random.uniform(0, 0.2), 0.8], randomness=None)
+        if self.config["task"]["deterministic"]:  #here we can contorl the difficulty of select_tube! i like it
+            init_container_config= self.get_entity_config(init_container, position=[0, 0, 0.8], randomness=None)
+        else:
+            init_container_config = self.get_entity_config(init_container, position=[random.uniform(-0.1, 0.1), random.uniform(0, 0.1), 0.8], randomness=None)
         self.config["task"]["components"].append(init_container_config)
         
     def load_objects(self, target_entity):
@@ -34,8 +37,9 @@ class SelectChemistryTubeConfigManager(BenchTaskConfigManager):
         for similar_objects in other_objects:
             other_objects_flatten.extend(similar_objects)
         objects.extend(random.sample(other_objects_flatten, self.num_object-1))
-        targer_rol_poses = random.sample(relative_col_pos, self.num_object)
-        target_poses = [[pos, random.choice(relative_row_pos), 0.05] for pos in targer_rol_poses] 
+        #targer_rol_poses = random.sample(relative_col_pos, self.num_object)
+        #target_poses = [[pos, random.choice(relative_row_pos), 0.05] for pos in targer_rol_poses]
+        target_poses = [[0, 0.05, 0.05]]  
         
         init_container_config = self.config["task"]["components"][-1]
         init_container_config["subentities"] = []

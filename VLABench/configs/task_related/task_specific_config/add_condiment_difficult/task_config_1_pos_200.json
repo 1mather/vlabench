@@ -100,10 +100,7 @@
             "target_entity":"apple",
             "initial_pose":{
                 "apple_positions": [
-                    [-0.2, 0.2, 0.8],  
-                    [-0.2, 0.1, 0.8],   
-                    [-0.3, 0.2, 0.8], 
-                    [-0.3, 0.1 ,0.8]   
+                    [-0.2, 0.18, 0.8]
                 ]
             },
             "components":[
@@ -123,12 +120,21 @@
     
     "add_condiment_series":{
         "task":{
+            "xml_path": 8,
+            "target_entity":"bbq_sauce",
             "asset":{
-                "seen_object":["bbq_sauce", "ketchup", "salt"], 
-                "unseen_object":["salad_dressing", "hotsauce", "sugar"],
+                "seen_object":["bbq_sauce"], 
+                "unseen_object":[],
                 "seen_container":["pan_seen"],
                 "unseen_container":["pan_unseen"]
             },
+            "deterministic":false,
+            "initial_pose":
+               [
+                    [0.2, 0, 0.85]
+                ]
+            ,
+            "container_pose":[0.3, 0.12, 0.79],
             "components":[
                 {
                     "name": "counter",

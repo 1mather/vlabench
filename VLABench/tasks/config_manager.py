@@ -216,7 +216,9 @@ class BenchTaskConfigManager():
         else:
             print(f"setting the pose of container {target_container}")
             if target_container is not None:
+                pose=self.config["task"]["container_pose"]
                 pose=[0.3, 0.12, 0.79]
+                #pose=[0.17, 0.2, 0.79] this is for  insert flower #the container place should be changed , if you want to evaluate the insert flower 
                 container_config = self.get_entity_config(target_container, position=pose,randomness=None)
                 self.config["task"]["components"].append(container_config)
     
@@ -232,11 +234,10 @@ class BenchTaskConfigManager():
         self.other_objects.remove(target_entity)
         objects.extend(random.sample(self.other_objects, self.num_object-1))
 
-        apple_positions=self.config["task"]["initial_pose"]["apple_positions"]
-
+        initial_pose=self.config["task"]["initial_pose"]
         for i, object in enumerate(objects):
             if object==target_entity:
-                selected_position =random.choice(apple_positions)
+                selected_position =random.choice(initial_pose)
                 if self.config["task"]["deterministic"]==True:
                     print("生成固定target_entity")
                     object_config = self.get_entity_config(
@@ -247,10 +248,12 @@ class BenchTaskConfigManager():
                                                     )
                 else:
                     print("生成随机target_entity")
+                    offsets=[random.uniform(-0.05, 0.05), random.uniform(-0.05, 0.05), 0]
+                    selected_position=[pos+offset for pos, offset in zip(selected_position, offsets)]
                     object_config = self.get_entity_config(
                                                         target_entity,
                                                         position=selected_position,
-                                                        randomness=DEFAULT_RABDOMNESS  # this randomness was usefull only when the object is not in "ignored randomness" in task_config
+                                                        randomness=None  # this randomness was usefull only when the object is not in "ignored randomness" in task_config
                     )
             elif object=="plate_seen":
                 import pdb

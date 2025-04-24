@@ -54,10 +54,16 @@ class AddCondimentConfigManager(BenchTaskConfigManager):
             #                                        position=[random.uniform(0.15, 0.2), 
             #                                                  -0.15+0.15*i, 
             #                                                  0.85])
-            initial_pos=self.config["task"]["initial_pose"].get("bbq_sauce_positions",[[0.2,0,0.85]])
-            initial_pos=random.sample(initial_pos,1)
-            object_config = self.get_entity_config(object, 
-                                                    position=initial_pos)
+            if self.config["task"]["deterministic"]:
+                initial_pos=self.config["task"]["initial_pose"].get("bbq_sauce_positions",[[0.2,0,0.85]])
+                initial_pos=random.sample(initial_pos,1)
+                object_config = self.get_entity_config(object, 
+                                                        position=initial_pos)
+            else:
+                object_config = self.get_entity_config(object, 
+                                                        position=[random.uniform(-0.05, 0.05)+0.2, 
+                                                                  random.uniform(-0.05, 0.05), 
+                                                                  0.85])
             if object in SHAKER_INGRADIENTS:
                 nametag_config = dict(
                     name=f"{object}_tag",

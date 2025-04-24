@@ -61,9 +61,10 @@
 
     "select_chemistry_tube_series": {
         "task":{
+            "target_entity":"KMnO4",
             "asset":{
-                "seen_object":[["CuCl2"], ["CuSO4"], ["FeCl3"], ["KMnO4"]],
-                "unseen_object":[["I2"], ["K2CrO4"]],
+                "seen_object":[["KMnO4"]],
+                "unseen_object":[],
                 "seen_init_container":["chemistry_tube_stand"],
                 "unseen_init_container":["chemistry_tube_stand"]
             },
@@ -98,11 +99,9 @@
             },
             "deterministic":true,
             "target_entity":"apple",
-            "initial_pose":{
-                "apple_positions": [
+            "initial_pose":[
                     [-0.2, 0.18, 0.8]
-                ]
-            },
+            ],
             "components":[
                 {
                     "name": "table",
@@ -120,11 +119,19 @@
     
     "add_condiment_series":{
         "task":{
+            "xml_path": 8,
+            "target_entity":"bbq_sauce",
             "asset":{
-                "seen_object":["bbq_sauce", "ketchup", "salt"], 
-                "unseen_object":["salad_dressing", "hotsauce", "sugar"],
+                "seen_object":["bbq_sauce"], 
+                "unseen_object":[],
                 "seen_container":["pan_seen"],
                 "unseen_container":["pan_unseen"]
+            },
+            "deterministic":true,
+            "initial_pose":{
+                "bbq_sauce_positions": [
+                    [0.2, 0, 0.85]
+                ]
             },
             "components":[
                 {
@@ -146,11 +153,17 @@
     "insert_flower_series":{
         "task":{
             "asset":{
-                "seen_object":["rose", "tulip", "chrysanthemum"],
-                "unseen_object":["sunflower", "daisy_flower", "peony"],
+                "seen_object":["rose"],
+                "unseen_object":[],
                 "seen_container":["vase_seen"],
                 "unseen_container":["vase_unseen"]
             },
+            "deterministic":true,
+            "target_entity":"rose",
+            "container_pose":[0.17, 0.2, 0.79],
+            "initial_pose":[
+                    [0.3, -0.1, 0.9]
+                ],
             "components":[
                 {
                     "name": "table",
@@ -723,9 +736,10 @@
 
     "rearrange_tube":{
         "task":{
+            "target_entity":"KMnO4",
             "asset":{
-                "seen_object": [["CuCl2"], ["CuSO4"], ["FeCl3"], ["KMnO4"]] ,
-                "unseen_object": [["I2"], ["K2CrO4"]],
+                "seen_object": [["KMnO4"]] ,
+                "unseen_object": [],
                 "seen_container": ["chemistry_tube_stand"],
                 "unseen_container": ["chemistry_tube_stand"],
                 "seen_init_container": ["chemistry_tube_stand"],

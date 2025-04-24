@@ -9,21 +9,26 @@ from VLABench.utils.utils import euler_to_quaternion
 class InsertFlowerConfigManager(BenchTaskConfigManager):
     def __init__(self,
                  task_name,
-                 num_objects=[3],
+                 num_objects=[1],
                  **kwargs):
         super().__init__(task_name, num_objects, **kwargs)
     
     def load_containers(self, target_container):
         super().load_containers(target_container)
         self.config["task"]["components"][-1].update(
-            position=[random.uniform(-0.3, 0.3), random.uniform(0.15, 0.25), 0.78]
+            #position=[random.uniform(-0.3, 0.3), random.uniform(0.15, 0.25), 0.78]
+            position=[-0.15, 0.15, 0.775]
         )
         
     def load_objects(self, target_entity):
         super().load_objects(target_entity)
         for i in range(self.num_object):
-            self.config["task"]["components"][-i-1]["position"] = [-0.3 + i * 0.3 + random.uniform(-0.05, 0.05), 
-                                                                   random.uniform(-0.15, -0.05), 0.9]
+            if self.config["task"]["deterministic"]:
+                self.config["task"]["components"][-i-1]["position"] = [0.3, -0.1, 0.9]
+            else:
+                self.config["task"]["components"][-i-1]["position"] = [0.3 + random.uniform(-0.05, 0.05), 
+                                                                     -0.1 + random.uniform(-0.05, 0.05), 0.9]
+
         
     def get_instruction(self, target_entity, target_container, **kwargs):
         instruction = f"Insert the {target_entity} into the {target_container}."
@@ -105,11 +110,11 @@ class InsertFlowerTask(LM4ManipBaseTask):
                 self._arena.attach(entity)
     
     def get_expert_skill_sequence(self, physics):
-        target_place_point = self.entities[self.target_container].get_place_point(physics)
+        target_place_point = np.array(self.entities[self.target_container].get_place_point(physics)[-1]) + np.array([0, 0, 0.05])
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name=self.target_entity),
-            partial(SkillLib.lift, target_quat=euler_to_quaternion(-np.pi/2, -np.pi/2, 0)),
-            partial(SkillLib.moveto, target_pos=target_place_point, target_quat=euler_to_quaternion(-np.pi/2, -np.pi/2, 0)),
+            partial(SkillLib.lift, target_quat=euler_to_quaternion(-np.pi/2, np.pi/2, 0)),
+            partial(SkillLib.moveto, target_pos=target_place_point, target_quat=euler_to_quaternion(-np.pi/2, np.pi/2, 0)),
             partial(SkillLib.lift, lift_height=-0.2)
         ]
         return skill_sequence
