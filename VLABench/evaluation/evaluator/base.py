@@ -9,7 +9,8 @@ from VLABench.utils.utils import euler_to_quaternion
 from scipy.spatial.transform import Rotation as R
 import pdb
 import copy
-
+from tutorials.test_client import send_test_request
+from VLABench.evaluation.model.policy.client import RemoteAgentClient
 OBSERVATION={
     "observation.image_0":2,
     "observation.image_1":3,
@@ -139,6 +140,7 @@ class Evaluator:
             random.seed(seed)
         env = load_env(task_name, config=episode_config)
         env.reset()
+        send_test_request(None,None,is_reset=True)
         #pdb.set_trace()
         success = False
         info = {}
@@ -183,8 +185,6 @@ class Evaluator:
                 """
                 这里可以添加多个接口用于测评不同的模型
                 """
-                from tutorials.test_client import send_test_request
-                from VLABench.evaluation.model.policy.client import RemoteAgentClient
                 if isinstance(agent, RemoteAgentClient):
                     ee_state = observation["ee_state"]
                     ee_pos, ee_quat, gripper = ee_state[:3], ee_state[3:7], np.array([ee_state[7]])
@@ -197,7 +197,7 @@ class Evaluator:
                     for img in self.observation_images:
                         observation_images_tosend[img] = observation["rgb"][OBSERVATION[img]]
                     try:
-                        pos, euler, gripper_state, view_index = send_test_request(observation_images_tosend,ee_state)
+                        pos, euler, gripper_state, view_index = send_test_request(observation_images_tosend,ee_state,is_reset=False)
                         distance_to_current=np.linalg.norm(pos-ee_pos)
 
                         print(f"the target pose is {pos}")

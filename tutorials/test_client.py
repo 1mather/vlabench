@@ -38,16 +38,20 @@ def preprocess_image(image):
     # image_chw = image_chw / 255.0  # 归一化到[0,1]范围
     
     return image_chw
-def send_test_request(images, ee_state):
+def send_test_request(images, ee_state,is_reset=False):
     """同步版本的send_test_request函数"""
     # 定义内部异步函数
     async def _async_send_request(images, ee_state):
         uri = "ws://127.0.0.1:8000"
         async with websockets.connect(uri) as websocket:
             observation = {}
-            for key,value in images.items():
-                observation[key] = np.array(preprocess_image(value),dtype=np.float32)
-            state = np.array(ee_state,dtype=np.float32)
+            if is_reset:
+                await websocket.send(b"reset")
+                return None
+            else:
+                for key,value in images.items():
+                    observation[key] = np.array(preprocess_image(value),dtype=np.float32)
+                state = np.array(ee_state,dtype=np.float32)
             # 创建观察数据，使用正确的键名
             observation["observation.state"] = state
             
