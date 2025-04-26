@@ -55,7 +55,7 @@ class AddCondimentConfigManager(BenchTaskConfigManager):
             #                                                  -0.15+0.15*i, 
             #                                                  0.85])
             if self.config["task"]["deterministic"]:
-                initial_pos=self.config["task"]["initial_pose"].get("bbq_sauce_positions",[[0.2,0,0.85]])
+                initial_pos=self.config["task"]["initial_pose"]
                 initial_pos=random.sample(initial_pos,1)
                 object_config = self.get_entity_config(object, 
                                                         position=initial_pos)
