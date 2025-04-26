@@ -163,7 +163,7 @@ checkpoints
 
 # ignore all files in the folder
 *.jpg
-VLABench/assets/obj
+VLABench/assets/obj/assets
 VLABench/assets/scenes
 VLABench/assets/robots
 VLABench/third_party
@@ -191,7 +191,7 @@ test__pycache__/
 /openvla_abbandon/
 /logs/
 /dataset/
-
+**/default_config.pkl
 # Model checkpoints and cache
 checkpoints/
 **/cache/
