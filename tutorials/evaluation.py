@@ -9,7 +9,7 @@ from VLABench.robots import *
 import transformers
 
 tasks=[
-    "select_fruit_table0",
+    "select_fruit_table0", # the pretrain task
     "select_fruit_table1",
     "select_fruit_table2",
     "select_fruit_table3",
