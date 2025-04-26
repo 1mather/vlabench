@@ -1,0 +1,40 @@
+<mujocoinclude>
+
+    <asset>
+
+        <mesh name="newtable_Main" file="./meshes/newtable_Main.stl" scale="0.01 0.01 0.01" />
+        <mesh name="newtable_Slide_Wood" file="./meshes/newtable_Slide_Wood.stl" scale="0.01 0.01 0.01" />
+        <mesh name="newtable_Slide_Handle" file="./meshes/newtable_Slide_Handle.stl" scale="0.01 0.01 0.01" />
+        <mesh name="newtable_Drawer_Wood" file="./meshes/newtable_Drawer_Wood.stl" scale="0.01 0.01 0.01" />
+        <mesh name="newtable_Drawer_Handle" file="./meshes/newtable_Drawer_Handle.stl" scale="0.01 0.01 0.01" />
+        <texture name="T_Wood_newtable" type="cube" height="1" width="1" file="../../assets/textures/stone.png" />
+        <texture name="T_Metal_newtable" type="cube" height="1" width="1" file="../../assets/textures/metal0.png" />
+
+        <material name="M_Wood_newtable" texture="T_Wood_newtable" rgba="0.8 0.8 0.8 1" shininess="0.2" reflectance="0.3" texuniform="false" />
+        <material name="M_Metal_newtable" texture="T_Metal_newtable" texrepeat="3 3" reflectance="0.7" texuniform="false" />
+
+		</asset>
+
+    <default>
+
+        <default class="viz_stl_Metal_newtable" >
+            <geom group="1" contype="0" conaffinity="0" type="mesh" material="M_Metal_newtable" />
+        </default>
+
+         <default class="viz_stl_Wood_newtable" >
+            <geom group="1" contype="0" conaffinity="0" type="mesh" material="M_Wood_newtable"/>
+        </default>
+
+        <default class="drawer_newtable" >
+            <geom contype="1" conaffinity="1" group="3" rgba="1 0 0 1" />
+            <joint limited="true" damping="2" frictionloss="5" armature="0.1" />
+        </default>
+
+        <default class="body_newtable" >
+            <geom contype="1" conaffinity="1" group="4" rgba="0 1 0 1" />
+            <joint limited="true" damping="1" frictionloss="0.5" armature=".01" />
+        </default>
+
+   </default>
+
+</mujocoinclude>

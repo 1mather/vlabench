@@ -1,0 +1,25 @@
+<mujoco model="table">
+
+    <asset>
+        <texture name="T_Table" type="cube" height="1" width="1" file="../../assets/textures/wood0.png" />
+        <material name="M_Table" texture="T_Table" rgba="0.8 0.8 0.8 1" shininess="0" reflectance="1" texuniform="false" />
+        <!-- <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/> -->
+        <!-- <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+            markrgb="0.8 0.8 0.8" width="300" height="300"/>
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/> -->
+    </asset>
+
+    <default>
+
+        <default class="visual" >
+            <geom group="1" contype="0" conaffinity="0" type="mesh" material="M_Table"/>
+        </default>
+
+        <default class="body" >
+            <geom contype="1" conaffinity="1" group="3" rgba=".4 .5 .6 1" solref="0.001 1"/>
+            <joint limited="true" damping="1" frictionloss="0.5" armature=".01" />
+        </default>
+
+   </default>
+
+</mujoco>
