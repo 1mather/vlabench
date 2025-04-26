@@ -19,7 +19,6 @@ OBSERVATION={
     "observation.image_4":4,
     "observation.image_wrist":5,
 }
-
 CAMERA_VIEW_INDEX={
     "select_painting": 1,
     "put_box_on_painting": 1,
@@ -28,6 +27,25 @@ CAMERA_VIEW_INDEX={
     "texas_holdem": 2,
     "cluster_toy": 2,
     "select_fruit":2,
+}
+
+tasktoconfig={
+    "select_fruit_table0":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_0.json",
+    "select_fruit_table1":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_1.json",
+    "select_fruit_table2":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_2.json",
+    "select_fruit_table3":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_3.json",
+    "select_fruit_table4":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_4.json",
+
+
+
+    "add_condiment":"configs/task_related/task_specific_config/add_condiment/task_config_1_pos_200.json",
+    "insert_flower":"configs/task_related/task_specific_config/insert_flower/task_config_1_pos_200.json",
+    "select_chemistry_tube":"configs/task_related/task_specific_config/select_chemistry_tube/task_config_1_pos_200.json",
+
+    "select_fruit_difficult":"configs/task_related/task_specific_config/select_apple_difficult/task_config_1_pos_200.json",
+    "add_condiment_difficult":"configs/task_related/task_specific_config/add_condiment_difficult/task_config_1_pos_200.json",
+    "insert_flower_difficult":"configs/task_related/task_specific_config/insert_flower_difficult/task_config_1_pos_200.json",
+    "select_chemistry_tube_difficult":"configs/task_related/task_specific_config/select_chemistry_tube_difficult/task_config_1_pos_200.json",
 }
 def quat2euler(quat, is_degree=False):
     r = R.from_quat([quat[1], quat[2], quat[3], quat[0]])
@@ -62,7 +80,12 @@ class Evaluator:
                 self.episode_config = json.load(f)
         else:self.episode_config = episode_config
         if self.episode_config is None:
-            print("Load the task episodes by seeds, instead of episodes")
+            print("Load the task episodes by task, instead of episodes")
+            episode_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),tasktoconfig.get(tasks[0]))
+            with open(episode_path, "r") as f:
+                self.episode_config = json.load(f)
+            if '_table' in tasks[0]:
+                tasks[0]=tasks[0].split("_table")[0]
         else:
             Warning(f"The number of episodes should be less than the number of configurations, {len(self.episode_config)} >= {n_episodes}")
         self.eval_tasks = tasks
@@ -124,7 +147,7 @@ class Evaluator:
                 json.dump(instruction, f)
         return metrics
         
-    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=200, **kwargs):
+    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=400, **kwargs):
         """
         If episode_config is given, the task and scene will load deterministically.
         params:
@@ -209,6 +232,7 @@ class Evaluator:
                 else:
                     pos, euler, gripper_state, view_index = agent.predict(observation, **kwargs)
                 quat = euler_to_quaternion(*euler)
+                #quat=euler_to_quaternion(np.pi,0,-0.5*np.pi)
                 action = env.robot.get_qpos_from_ee_pos(physics=env.physics, pos=pos, quat=quat)[:7]#delta关节角度
                 action = np.concatenate([action, gripper_state])
             elif agent.control_mode == "joint":

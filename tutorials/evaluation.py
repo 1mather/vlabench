@@ -7,13 +7,30 @@ from VLABench.evaluation.model.policy.client import RemoteAgentClient
 from VLABench.tasks import *
 from VLABench.robots import *
 import transformers
-demo_tasks = ["add_condiment"]
+
+tasks=[
+    "select_fruit_table0",
+    "select_fruit_table1",
+    "select_fruit_table2",
+    "select_fruit_table3",
+    "select_fruit_table4",
+
+
+    "add_condiment",
+    "insert_flower",
+    "select_chemistry_tube",
+
+    "select_fruit_difficult",
+    "add_condiment_difficult",
+    "insert_flower_difficult",
+    "select_chemistry_tube_difficult",
+
+]
+
+
+demo_tasks = ["select_fruit_table1"]
 unseen = False
 save_dir = "/mnt/data/310_jiarui/VLABench/logs"
-#/home/tyj/Documents/310_jiarui/openvla/log/train_log/openvla-7b+h5py_dataset+b1+lr-0.0005+lora-r8+dropout-0.0
-# model_ckpt = "/mnt/data/310_jiarui/VLABench/model_parameter/base/openvla-7b+vlabench_dataset+b80+lr-0.0005+lora-r16+dropout-0.0--time-20250408-13"
-# lora_ckpt ="/mnt/data/310_jiarui/VLABench/model_parameter/adapter/openvla-7b+vlabench_dataset+b80+lr-0.0005+lora-r16+dropout-0.0--time-20250408-13"
-
 
 from huggingface_hub import login
 from pathlib import Path
@@ -22,136 +39,14 @@ os.environ["MUJOCO_GL"] = "egl"
 evaluator = Evaluator(
     tasks=demo_tasks,
     n_episodes=20,     #配置评测次数
-    #episode_config="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/select_apple/task_config_1_pos_100.json",
-    episode_config="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/add_condiment/task_config_1_pos_100.json",
     max_substeps=10,   
     save_dir=save_dir,
     visulization=True,
-    observation_images=["observation.image_1"]  # 可以传入任意的image，但请与训练的时候保持一致。
+    #observation_images=["observation.image_1","observation.image_2","observation.image_3","observation.image_4"]  # 可以传入任意的image，但请与训练的时候保持一致。
+    #observation_images=["observation.image_1","observation.image_2"]
+    observation_images=["observation.image_0"]
 )
-"""
-现有的输入
-observation.image_
-observation.state
-"""
+
 policy = RemoteAgentClient(model="VQ_BET")
 result = evaluator.evaluate (policy)
 
-"""
-the current pose is [ 2.03858954e-04 -1.58272853e-01  1.24621967e+00]
-[2.03858954e-04 2.41727147e-01 4.66219669e-01] [ 3.14119968  0.02413992 -1.60769427] [0.]
-the target pose is [0.15373805 0.07445041 0.92934817]
-distance_to_current 0.5157928493704675
-the current pose is [0.11445528 0.05487047 1.0066066 ]
-[0.11445528 0.45487047 0.2266066 ] [ 3.00224667 -0.04921305 -1.54882609] [1.]
-the target pose is [0.16138464 0.07706473 0.92263856]
-distance_to_current 0.7933473608629504
-the current pose is [0.15656876 0.071954   0.92372963]
-[0.15656876 0.471954   0.14372963] [ 3.1003697  -0.02436849 -1.57040011] [1.]
-the target pose is [0.15147117 0.02134267 0.96442242]
-distance_to_current 0.9362762482834738
-the current pose is [0.15156906 0.02237666 0.95638877]
-[0.15156906 0.42237666 0.17638877] [ 3.13103007 -0.02207351 -1.57339236] [1.]
-the target pose is [0.16187757 0.03256605 0.95859302]
-distance_to_current 0.874014913165467
-the current pose is [0.16027269 0.0286235  0.95445468]
-[0.16027269 0.4286235  0.17445468] [-3.09129772 -0.01962498 -1.57106099] [1.]
-the target pose is [0.17122233 0.03245012 0.96004689]
-distance_to_current 0.8799024716663784
-the current pose is [0.16975668 0.02904329 0.95561607]
-[0.16975668 0.42904329 0.17561607] [ 3.12532855 -0.01980957 -1.57264915] [1.]
-the target pose is [0.18539488 0.04702286 0.95215872]
-distance_to_current 0.8655649297815273
-the current pose is [0.18320932 0.04242355 0.94821827]
-[0.18320932 0.44242355 0.16821827] [ 3.13562975 -0.01920844 -1.57159994] [1.]
-the target pose is [0.19885141 0.04595355 0.95240295]
-distance_to_current 0.8788508062331643
-the current pose is [0.1936284  0.04256373 0.94785736]
-[0.1936284  0.44256373 0.16785736] [-3.13946868 -0.01957417 -1.5718728 ] [1.]
-the target pose is [0.20955729 0.05027465 0.9555392 ]
-distance_to_current 0.8801063185200687
-the current pose is [0.20697732 0.0464651  0.95044269]
-[0.20697732 0.4464651  0.17044269] [ 3.12928384 -0.01777779 -1.57176513] [1.]
-the target pose is [0.21572548 0.05454562 0.95697422]
-distance_to_current 0.8788112782054003
-the current pose is [0.21389597 0.05070394 0.95188288]
-[0.21389597 0.45070394 0.17188288] [-3.06582045 -0.01861572 -1.5711621 ] [1.]
-the target pose is [0.22006673 0.06001148 0.95231373]
-distance_to_current 0.8727834782660647
-the current pose is [0.21879829 0.05600725 0.94767543]
-[0.21879829 0.45600725 0.16767543] [ 3.13924106 -0.02078334 -1.57089676] [1.]
-the target pose is [0.22423577 0.06657532 0.94611391]
-distance_to_current 0.8704327987647321
-the current pose is [0.22241371 0.06212876 0.94179981]
-[0.22241371 0.46212876 0.16179981] [ 3.12062617 -0.02001663 -1.5714415 ] [1.]
-the target pose is [0.23226714 0.07052777 0.93890783]
-distance_to_current 0.8702558823890532
-the current pose is [0.22941303 0.06604643 0.93489432]
-[0.22941303 0.46604643 0.15489432] [-3.1283707  -0.01994715 -1.57065049] [1.]
-the target pose is [0.23492926 0.09141777 0.9470997 ]
-distance_to_current 0.8763369355087544
-the current pose is [0.23325516 0.08619203 0.94087187]
-[0.23325516 0.48619203 0.16087187] [-3.12519187 -0.01814791 -1.57159171] [1.]
-the target pose is [0.24173105 0.09045277 0.95024574]
-distance_to_current 0.8830586093520083
-the current pose is [0.23976385 0.08669323 0.94416365]
-[0.23976385 0.48669323 0.16416365] [-3.00354684 -0.01945186 -1.57220442] [1.]
-the target pose is [0.244874   0.09882424 0.94420259]
-distance_to_current 0.8711654332061021
-the current pose is [0.24345736 0.0945226  0.93887477]
-[0.24345736 0.4945226  0.15887477] [-3.06641925 -0.02056222 -1.57105524] [1.]
-the target pose is [0.2502265  0.1034132  0.94043939]
-distance_to_current 0.8739883539778812
-the current pose is [0.24858861 0.09930273 0.93468439]
-[0.24858861 0.49930273 0.15468439] [ 3.1383545  -0.01993526 -1.57190653] [1.]
-the target pose is [0.26477629 0.10765264 0.93313581]
-distance_to_current 0.871572394053296
-the current pose is [0.26160844 0.1032459  0.92742665]
-[0.26160844 0.5032459  0.14742665] [-3.06383378 -0.01942876 -1.57155735] [1.]
-the target pose is [0.28361094 0.10230604 0.91694994]
-distance_to_current 0.8679878856075528
-the current pose is [0.28141435 0.09874393 0.91183412]
-[0.28141435 0.49874393 0.13183412] [ 3.05815355 -0.04512666 -1.57155193] [1.]
-the target pose is [0.28384835 0.10370258 0.91354138]
-distance_to_current 0.8758594782576725
-the current pose is [0.28165383 0.09949798 0.90707323]
-[0.28165383 0.49949798 0.12707323] [-3.13231876 -0.04639103 -1.57105584] [1.]
-the target pose is [0.28143907 0.10559181 0.91262106]
-distance_to_current 0.8787761488287914
-the current pose is [0.28008696 0.1014121  0.9062188 ]
-[0.28008696 0.5014121  0.1262188 ] [ 3.10738563 -0.04545566 -1.57045612] [1.]
-the target pose is [0.2792415  0.10174534 0.91203897]
-distance_to_current 0.8816164537976748
-the current pose is [0.27782285 0.09852088 0.90561199]
-[0.27782285 0.49852088 0.12561199] [ 3.10026288 -0.04543094 -1.56985722] [1.]
-the target pose is [0.27807301 0.10718999 0.90652719]
-distance_to_current 0.873480668018815
-the current pose is [0.27650914 0.10224837 0.90114116]
-[0.27650914 0.50224837 0.12114116] [ 3.09374904 -0.04588271 -1.56980726] [1.]
-the target pose is [0.28606725 0.10873792 0.89796625]
-distance_to_current 0.8708610938450415
-the current pose is [0.28306907 0.1043944  0.89247055]
-[0.28306907 0.5043944  0.11247055] [ 3.09482901 -0.05350672 -1.56862912] [0.]
-the target pose is [0.28688067 0.1019694  0.89862484]
-distance_to_current 0.8831755105540806
-the current pose is [0.284593   0.09909779 0.89204251]
-[0.284593   0.49909779 0.11204251] [ 3.10931046 -0.06160841 -1.56934714] [0.]
-the target pose is [0.27464813 0.09763972 0.88975882]
-distance_to_current 0.875277178441454
-the current pose is [0.27437482 0.09451607 0.88441605]
-[0.27437482 0.49451607 0.10441605] [ 3.06362109 -0.10256082 -1.57114001] [0.]
-the target pose is [0.27205461 0.09033731 0.87941335]
-distance_to_current 0.8740633116410791
-the current pose is [0.27119436 0.08852618 0.87618306]
-[0.27119436 0.48852618 0.09618306] [ 3.07607298 -0.1189898  -1.57046106] [0.]
-the target pose is [0.27430803 0.08760772 0.87304121]
-distance_to_current 0.874216163589304
-the current pose is [0.27214671 0.08456236 0.86872591]
-[0.27214671 0.48456236 0.08872591] [ 3.04260103 -0.13582335 -1.57027995] [0.]
-the target pose is [-0.19488662  0.0825176   0.88779315]
-distance_to_current 1.0090929517943732
-the current pose is [-0.10085527  0.10995574  0.88117013]
-[-0.10085527  0.50995574  0.10117013] [-2.98220146 -0.08012893 -1.52655895] [0.]
-the target pose is [-0.18339685  0.0814828   0.87580262]
-
-"""

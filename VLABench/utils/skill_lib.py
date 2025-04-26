@@ -7,7 +7,7 @@ from VLABench.utils.utils import find_keypoint_and_prepare_grasp, distance, quat
 from VLABench.algorithms.motion_planning.rrt import rrt_motion_planning
 from VLABench.algorithms.utils import interpolate_path, qauternion_slerp
 
-PRIOR_EULERS = [[np.pi, 0, np.pi/2], # face down, horizontal
+PRIOR_EULERS = [[np.pi, 0, -np.pi/2], # face down, horizontal
                 [np.pi, 0, 0], # face down, vertical
                 [-np.pi/2, -np.pi/2, 0], # face forward, horizontal
                 [-np.pi/2, 0, 0], # face forward, vertical

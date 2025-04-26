@@ -107,8 +107,9 @@
             "components":[
                 {
                     "name": "table",
-                    "xml_path": "obj/meshes/table/table.xml",
+                    "xml_path": "obj/meshes/table/table_4.xml",
                     "class": "Table",
+                    "materials":"wood1",
                     "randomness": {
                     }
                 }
