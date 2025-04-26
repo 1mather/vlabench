@@ -88,6 +88,7 @@ class Evaluator:
                 tasks[0]=tasks[0].split("_table")[0]
         else:
             Warning(f"The number of episodes should be less than the number of configurations, {len(self.episode_config)} >= {n_episodes}")
+
         self.eval_tasks = tasks
         self.n_episodes = n_episodes 
         
@@ -147,7 +148,7 @@ class Evaluator:
                 json.dump(instruction, f)
         return metrics
         
-    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=400, **kwargs):
+    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=200, **kwargs):
         """
         If episode_config is given, the task and scene will load deterministically.
         params:
