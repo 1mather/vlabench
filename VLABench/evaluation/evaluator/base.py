@@ -36,6 +36,7 @@ tasktoconfig={
     "select_fruit_table3":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_3.json",
     "select_fruit_table4":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_4.json",
 
+    "select_fruit_random_position":"configs/task_related/task_specific_config/select_apple_ood/task_config_rand_pos.json",
 
 
     "add_condiment":"configs/task_related/task_specific_config/add_condiment/task_config_1_pos_200.json",
@@ -88,6 +89,8 @@ class Evaluator:
                 tasks[0]=tasks[0].split("_table")[0]
             if "difficult" in tasks[0]:
                 tasks[0]=tasks[0].split("_difficult")[0]
+            if "random_position" in tasks[0]:
+                tasks[0]=tasks[0].split("_random_position")[0]
         else:
             Warning(f"The number of episodes should be less than the number of configurations, {len(self.episode_config)} >= {n_episodes}")
 

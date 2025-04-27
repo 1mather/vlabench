@@ -15,6 +15,8 @@ tasks=[
     "select_fruit_table3",
     "select_fruit_table4",
 
+    "select_fruit_random_position",     #randomness in [-10,-5] [5,10] cm
+
 
     "add_condiment",
     "insert_flower",
@@ -28,7 +30,7 @@ tasks=[
 ]
 
 
-demo_tasks = ["select_fruit_table1"]
+demo_tasks = ["select_fruit_random_position"]
 unseen = False
 save_dir = "/mnt/data/310_jiarui/VLABench/logs"
 
@@ -38,13 +40,13 @@ import os
 os.environ["MUJOCO_GL"] = "egl"
 evaluator = Evaluator(
     tasks=demo_tasks,
-    n_episodes=20,     #配置评测次数
+    n_episodes=50,     #配置评测次数
     max_substeps=10,   
     save_dir=save_dir,
     visulization=True,
     #observation_images=["observation.image_1","observation.image_2","observation.image_3","observation.image_4"]  # 可以传入任意的image，但请与训练的时候保持一致。
     #observation_images=["observation.image_1","observation.image_2"]
-    observation_images=["observation.image_0"]
+    observation_images= ["observation.image_0"]
 )
 
 policy = RemoteAgentClient(model="VQ_BET")

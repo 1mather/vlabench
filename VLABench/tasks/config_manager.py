@@ -248,8 +248,21 @@ class BenchTaskConfigManager():
                                                     )
                 else:
                     print("生成随机target_entity")
-                    offsets=[random.uniform(-0.05, 0.05), random.uniform(-0.05, 0.05), 0]
-                    selected_position=[pos+offset for pos, offset in zip(selected_position, offsets)]
+                    if "ood_random_position" in self.config["task"] and self.config["task"]["ood_random_position"]:
+                        if random.random() < 0.5:
+                            x_offset = random.uniform(-0.1, -0.05)  # 左侧范围
+                        else:
+                            x_offset = random.uniform(0.05, 0.1)    # 右侧范围
+                        if random.random() < 0.5:
+                            y_offset = random.uniform(-0.1, -0.05)  # 左侧范围
+                        else:
+                            y_offset = random.uniform(0.05, 0.1)    # 右侧范围
+                            
+                        offsets=[x_offset, y_offset, 0]  
+                        selected_position=[pos+offset for pos, offset in zip(selected_position, offsets)]
+                    else:
+                        offsets=[random.uniform(-0.05, 0.05), random.uniform(-0.05, 0.05), 0]
+                        selected_position=[pos+offset for pos, offset in zip(selected_position, offsets)]
                     object_config = self.get_entity_config(
                                                         target_entity,
                                                         position=selected_position,
