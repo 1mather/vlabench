@@ -86,6 +86,8 @@ class Evaluator:
                 self.episode_config = json.load(f)
             if '_table' in tasks[0]:
                 tasks[0]=tasks[0].split("_table")[0]
+            if "difficult" in tasks[0]:
+                tasks[0]=tasks[0].split("_difficult")[0]
         else:
             Warning(f"The number of episodes should be less than the number of configurations, {len(self.episode_config)} >= {n_episodes}")
 
