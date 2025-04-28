@@ -36,6 +36,13 @@ tasktoconfig={
     "select_fruit_table3":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_3.json",
     "select_fruit_table4":"configs/task_related/task_specific_config/select_apple/task_config_1_pos_200_table_4.json",
 
+
+    "select_fruit_difficult_table0":"configs/task_related/task_specific_config/select_apple_difficult/task_config_1_pos_200_table_0.json",
+    "select_fruit_difficult_table1":"configs/task_related/task_specific_config/select_apple_difficult/task_config_1_pos_200_table_1.json",
+    "select_fruit_difficult_table2":"configs/task_related/task_specific_config/select_apple_difficult/task_config_1_pos_200_table_2.json",
+    "select_fruit_difficult_table3":"configs/task_related/task_specific_config/select_apple_difficult/task_config_1_pos_200_table_3.json",
+    "select_fruit_difficult_table4":"configs/task_related/task_specific_config/select_apple_difficult/task_config_1_pos_200_table_4.json",
+
     "select_fruit_random_position":"configs/task_related/task_specific_config/select_apple_ood/task_config_rand_pos.json",
 
 
