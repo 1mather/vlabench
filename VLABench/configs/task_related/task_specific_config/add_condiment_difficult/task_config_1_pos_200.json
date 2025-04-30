@@ -119,6 +119,7 @@
     },
     
     "add_condiment_series":{
+        "basexmlpath":"/mnt/data/310_jiarui/VLABench/VLABench/assets/base/default.xml",
         "task":{
             "xml_path": 8,
             "target_entity":"bbq_sauce",

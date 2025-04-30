@@ -49,8 +49,12 @@ class LM4ManipBaseTask(composer.Task):
         self.task_name = task_name
         self.config_manager = register.load_config_manager(task_name)(task_name,config=kwargs["config"])
         self.asset_path = os.path.join(os.getenv("VLABENCH_ROOT"), "assets") 
-        self.use_llm = use_llm       
-        self._arena = composer.Arena(xml_path=os.path.join(self.asset_path, "base/default.xml"))
+        self.use_llm = use_llm
+        if kwargs["config"].get("basexmlpath", None) is None:
+            self._arena=composer.Arena(xml_path=os.path.join(self.asset_path, "base/default.xml"))
+        else:
+            self._arena = composer.Arena(xml_path=os.path.join(self.asset_path, kwargs["config"]["basexmlpath"]))       
+        #self._arena = composer.Arena(xml_path=os.path.join(self.asset_path, "base/default.xml"))
         self._robot = robot
         self.attach_entity(robot)
         self._task_observables = {}
