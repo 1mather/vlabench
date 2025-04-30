@@ -34,12 +34,13 @@ tasks=[
     "insert_flower_difficult",
     "select_chemistry_tube_difficult",
 
+    "select_fruit_ood_camera",
 ]
 
 
-demo_tasks = ["select_fruit_difficult_table1"]
+demo_tasks = ["select_fruit_difficult_table3"]
 unseen = False
-save_dir = "/mnt/data/310_jiarui/VLABench/logs"
+save_dir = "/mnt/data/310_jiarui/VLABench/logs/select_fruit_difficult_table3_BCDE_50"
 
 from huggingface_hub import login
 from pathlib import Path

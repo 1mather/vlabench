@@ -54,6 +54,9 @@ tasktoconfig={
     "add_condiment_difficult":"configs/task_related/task_specific_config/add_condiment_difficult/task_config_1_pos_200.json",
     "insert_flower_difficult":"configs/task_related/task_specific_config/insert_flower_difficult/task_config_1_pos_200.json",
     "select_chemistry_tube_difficult":"configs/task_related/task_specific_config/select_chemistry_tube_difficult/task_config_1_pos_200.json",
+
+    "select_fruit_ood_camera":"configs/task_related/task_specific_config/select_apple_ood_camera/task_config_1_pos_200.json",
+
 }
 def quat2euler(quat, is_degree=False):
     r = R.from_quat([quat[1], quat[2], quat[3], quat[0]])
@@ -98,6 +101,8 @@ class Evaluator:
                 tasks[0]=tasks[0].split("_difficult")[0]
             if "random_position" in tasks[0]:
                 tasks[0]=tasks[0].split("_random_position")[0]
+            if "ood_camera" in tasks[0]:
+                tasks[0]=tasks[0].split("_ood_camera")[0]
         else:
             Warning(f"The number of episodes should be less than the number of configurations, {len(self.episode_config)} >= {n_episodes}")
 
@@ -160,7 +165,7 @@ class Evaluator:
                 json.dump(instruction, f)
         return metrics
         
-    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=200, **kwargs):
+    def evaluate_single_episode(self, agent, task_name, episode_id, episode_config, seed=42, max_episode_length=250, **kwargs):
         """
         If episode_config is given, the task and scene will load deterministically.
         params:
