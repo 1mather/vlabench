@@ -13,18 +13,18 @@ pip install -e .
 ```
 2. Download the assets
 ```sh
-python script/download_assetes.py
+python script/download_assets.py
 ```
 The script will automatically download the necessary assets and unzip them into the correct directory.
 
 
 
 
-## Trajectory Generation
+## Trajectory Generation∂
 
 ### Generate Episode
 
-#### 1. generate the  .hdf5 episodes
+#### 1. generate   .hdf5 episodes
 
 ---
 
@@ -109,7 +109,7 @@ python /VLABench/scripts/convert_to_lerobot.py --dataset-name select_fruit_1_50_
 
 #### 3. Evaluate your policy in a different thread or machine via WebSocket
 
-**select_fruit_difficult**
+**select_apple_difficult**
 ```bash
 python /VLABench/tutorials/evaluation.py --task select_fruit_difficult --n_episodes 50 --max_substeps 10 \
   --save_dir /mnt/data/310_jiarui/VLABench/logs/select_fruit_difficult
@@ -117,3 +117,4 @@ python /VLABench/tutorials/evaluation.py --task select_fruit_difficult --n_episo
 
 > **Note:**  
 > Before running the above command, please make sure the policy server has been launched and is listening on `127.0.0.1:8000`.
+> More available tasks can be found in the VLABench/tutorials/evaluation.py
