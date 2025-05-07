@@ -163,9 +163,9 @@ checkpoints
 
 # ignore all files in the folder
 *.jpg
-VLABench/assets/obj/assets
+VLABench/assets/obj/meshes
 VLABench/assets/scenes
-VLABench/assets/robots
+!VLABench/assets/scenes/studyroom_1
 VLABench/third_party
 **/test_result/
 **/cache/
