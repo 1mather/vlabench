@@ -109,12 +109,12 @@ def create_lerobot_dataset_from_hdf5(args):
                             action = np.concatenate([action[:6], np.array([0])])
                         dataset.add_frame(
                             {
-                                "observation.image_0": images[i][2], #左低
-                                "observation.image_1": images[i][3], # 左高
-                                "observation.image_2": images[i][0], # 右低
-                                "observation.image_3": images[i][1], # 右高
-                                "observation.image_4": images[i][4], # 正前方
-                                "observation.image_wrist": images[i][5], # 手腕 
+                                "observation.image_0": images[i][2], #left low
+                                "observation.image_1": images[i][3], #left high
+                                "observation.image_2": images[i][0], #right low
+                                "observation.image_3": images[i][1], #right high
+                                "observation.image_4": images[i][4], #front
+                                "observation.image_wrist": images[i][5], #wrist 
                                 "observation.state": ee_state[i],
                                 "action": action,
                                 
@@ -131,9 +131,10 @@ def create_lerobot_dataset_from_hdf5(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a LeRobot dataset")
-    parser.add_argument("--dataset-name", type=str, default="select_fruit_fixed_1_pos", help="Name of the dataset")
-    parser.add_argument("--dataset-path", type=str, default="/mnt/data/310_jiarui/VLABench/media/select_fruit_fixed_1_pos", help="Path to the dataset")
+    parser.add_argument("--dataset-name", type=str, default="select_chemistry_tube_1_200", help="Name of the dataset")
+    parser.add_argument("--dataset-path", type=str, default="/mnt/data/310_jiarui/VLABench/media/select_chemistry_tube_1_200")
     parser.add_argument("--max-files", type=int, default=200, help="Maximum number of files to process")
     parser.add_argument("--max-episodes", type=int, default=200, help="Maximum number of episodes to process")
     args = parser.parse_args()
     create_lerobot_dataset_from_hdf5(args)
+    

@@ -6,48 +6,47 @@ import json
 import os
 from scipy.spatial.transform import Rotation as R
 def quat2euler(quat):
-    """四元数转欧拉角"""
+    """convert quaternion to euler angle"""
     r = R.from_quat([quat[1], quat[2], quat[3], quat[0]])
-    euler = r.as_euler('xyz', degrees=False)  # 弧度制
+    euler = r.as_euler('xyz', degrees=False)  # radian
     return euler
 
 
 
 
 def unwrap_angles(angles):
-    """处理角度环绕，使角度变化连续"""
+    """handle angle wrapping, make the angle change continuous"""
     return np.unwrap(angles, axis=0)
 
 def plot_trajectory_comparison(filepath):
-    # 创建输出目录
+    # create output directory
     dataset_dir = Path(filepath).parent
     plot_dir = dataset_dir / "plot"
     plot_dir.mkdir(exist_ok=True)
     
-    # 加载数据
+    # load data
     with h5py.File(filepath, 'r') as f:
         data_group = list(f['data'].keys())[0]
         trajectory = np.array(f['data'][data_group]['trajectory'])
         ee_state = np.array(f['data'][data_group]['observation']['ee_state'])
-        # 转换 ee_state 中的四元数为欧拉角并处理角度环绕
         ee_euler = np.array([quat2euler(ee_state[i, 3:7]) for i in range(len(ee_state))])
-        ee_euler = unwrap_angles(ee_euler)  # 处理角度环绕
+        ee_euler = unwrap_angles(ee_euler)  # handle angle wrapping
     
-    # 处理 trajectory 中的欧拉角
+
     trajectory_angles = trajectory[:, 3:6]
-    trajectory_angles = unwrap_angles(trajectory_angles)  # 处理角度环绕
+    trajectory_angles = unwrap_angles(trajectory_angles)  # handle angle wrapping
     
-    # 更新 trajectory 数据
+
     trajectory_unwrapped = np.concatenate([
-        trajectory[:, :3],          # 位置保持不变
-        trajectory_angles,          # 处理后的角度
+        trajectory[:, :3],          # position
+        trajectory_angles,          # processed angles
         trajectory[:, -1:],         # gripper
     ], axis=1)
     
-    # 组合新的 ee_state
+    # combine new ee_state
     ee_state_euler = np.concatenate([
-        ee_state[:, :3],  # 位置
-        ee_euler,         # 处理后的欧拉角
+        ee_state[:, :3],  # position
+        ee_euler,         # processed euler angle
         ee_state[:, -1:]  # gripper
     ], axis=1)
     
@@ -57,7 +56,7 @@ def plot_trajectory_comparison(filepath):
     n_timesteps = trajectory.shape[0]
     time_steps = np.arange(n_timesteps)
     
-    # 创建8个子图（ee_state的8个维度）
+    # create 8 subplots (8 dimensions of ee_state)
     fig, axes = plt.subplots(4, 2, figsize=(15, 20))
     fig.suptitle('EE State and Trajectory Over Time')
     
@@ -77,17 +76,16 @@ def plot_trajectory_comparison(filepath):
         col = idx % 2
         ax = axes[row, col]
 
-        # 绘制 ee_state
+        # plot ee_state
         ax.plot(time_steps[:-2], ee_state_euler[:-2, dim], label='EE State', linewidth=2)
         
-        # 如果是前3个维度或最后一个维度，也绘制 trajectory
         
         ax.plot(time_steps[:-2], trajectory_unwrapped[:-2, dim], label='Trajectory', linewidth=2, linestyle='--')
         
-        # 对于角度维度，添加说明
+
         if 3 <= dim <= 5:
             ax.set_title(f"{title} (Unwrapped)")
-            # 可选：添加原始角度范围的参考线
+            # optional: add reference lines for the original angle range
             ax.axhline(y=np.pi, color='r', linestyle=':', alpha=0.3)
             ax.axhline(y=-np.pi, color='r', linestyle=':', alpha=0.3)
         
@@ -96,7 +94,7 @@ def plot_trajectory_comparison(filepath):
         ax.grid(True)
         ax.legend()
         
-        # 添加统计信息
+        # add statistics information
         stats_text_ee_state = f'EE State: Mean: {np.mean(ee_state_euler[:, dim]):.3f}\nStd: {np.std(ee_state_euler[:, dim]):.3f}'
         stats_text_trajectory = f'Trajectory: Mean: {np.mean(trajectory_unwrapped[:, dim]):.3f}\nStd: {np.std(trajectory_unwrapped[:, dim]):.3f}'
         ax.text(0.02, 0.95, stats_text_ee_state, transform=ax.transAxes,
@@ -106,7 +104,7 @@ def plot_trajectory_comparison(filepath):
     
     plt.tight_layout()
     
-    # 保存图片
+    # save image
     plot_path = plot_dir / f"{Path(filepath).stem}_all_dimensions.png"
     plt.savefig(plot_path)
     plt.close()
@@ -114,10 +112,10 @@ def plot_trajectory_comparison(filepath):
     print(f"Plot saved to {plot_path}")
 
 def process_dataset_directory(dataset_dir):
-    """处理整个数据集目录下的所有 HDF5 文件"""
+    """process all hdf5 files in the dataset directory"""
     dataset_dir = Path(dataset_dir)
     
-    # 获取所有 HDF5 文件
+    # get all hdf5 files
     hdf5_files = list(dataset_dir.glob("*.hdf5"))
     
     for filepath in hdf5_files:
@@ -131,4 +129,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     process_dataset_directory(args.dir)
-#python plot_trajectory_comparison.py --dir /path/to/dataset

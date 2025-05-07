@@ -24,15 +24,16 @@ from dm_control.composer import Task
 os.environ["MUJOCO_GL"] = "egl"
 def get_args():
     parser = argparse.ArgumentParser(description='Generate trajectory for a task')
+    #parser.add_argument('--task-name', default="insert_flower", type=str, help='task name')
     parser.add_argument('--task-name', default="add_condiment", type=str, help='task name')
     parser.add_argument('--record-video', default=True, help='record video')
-    parser.add_argument('--save-dir', default="/mnt/data/310_jiarui/VLABench/media/add_condiment_4_800")
-    parser.add_argument('--n-sample', default=800, type=int, help='number of samples to generate')
+    parser.add_argument('--save-dir', default="/mnt/data/310_jiarui/VLABench/media/difficulty/add_condiment_1_200")
+    parser.add_argument('--n-sample', default=250, type=int, help='number of samples to generate')
     parser.add_argument('--start-id', default=1, type=int, help='start index for data storage')
     parser.add_argument('--robot', default="franka", type=str, help='robot name')
     parser.add_argument('--debug', action="store_true", default=False, help='debug mode')
     parser.add_argument('--early-stop', action="store_true", default=False, help='whether use early stop when skill failed to carry out')
-    parser.add_argument('--config-path', default="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/add_condiment/task_config_4_pos_800.json", type=str, help='policy path')
+    parser.add_argument('--config-path', default="/mnt/data/310_jiarui/VLABench/VLABench/configs/task_related/task_specific_config/add_condiment_difficult/task_config_1_pos_200.json")
 
     args = parser.parse_args()
     return args
@@ -61,7 +62,8 @@ def generate_trajectory(args, index, logger):
         for skill in skill_seq:
             obs, waypoint, stage_success, task_success = skill(env)
             if args.debug:
-                for o in obs: observations.append(dict(rgb=o["rgb"]))#如果是debug模式，则只保存rgb图像。不保存其他的数据
+                for o in obs: observations.append(dict(rgb=o["rgb"]))
+            # Save the first frame of each skill as an image
             else:
                 observations.extend(obs)
                 waypoints.extend(waypoint)
@@ -73,7 +75,7 @@ def generate_trajectory(args, index, logger):
     else: # TODO: some special tasks should be handled based on the feedback
         raise NotImplementedError("No expert skill sequence found")
     task_dir = os.path.join(args.save_dir, args.task_name)
-    #保存视频
+
     if args.record_video:
         frames = [] 
         for o in observations:
@@ -93,7 +95,7 @@ def generate_trajectory(args, index, logger):
     data_to_save = process_observations(observations)
     
     robot_position = env.robot.robot_config["position"]
-    robot_frame_waypoints = [np.array(waypoint) - np.concatenate([robot_position, np.zeros(5)]) for waypoint in waypoints] # 转换后为路径在机器人坐标下的相对坐标。因为机器人的5个维度的姿态参数是0
+    robot_frame_waypoints = [np.array(waypoint) - np.concatenate([robot_position, np.zeros(5)]) for waypoint in waypoints] 
     data_to_save["trajectory"] = robot_frame_waypoints
     data_to_save["entities"] = meta_info["entities"]
     data_to_save["target_entity"] = meta_info["target_entity"]

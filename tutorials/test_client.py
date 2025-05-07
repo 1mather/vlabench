@@ -9,7 +9,18 @@ import sys
 import msgpack_numpy
 import msgpack
 import torch
-# 配置日志
+import os
+import numpy as np
+from PIL import Image
+import cv2
+import time
+
+import os
+import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import Path
+
+DEBUG = True
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -18,29 +29,38 @@ logging.basicConfig(
     ]
 )
 
+def save_image(key,value):
+    save_dir = "images_sent_to_model"
+    os.makedirs(save_dir, exist_ok=True)
+    filename = f"{key}_.png"
+    filepath = os.path.join(save_dir, filename)
+    if isinstance(value, np.ndarray):
+
+        if value.ndim == 3 and value.shape[2] == 3:  # RGB image
+            cv2.imwrite(filepath, cv2.cvtColor(value, cv2.COLOR_RGB2BGR))
+        elif value.ndim == 2 or (value.ndim == 3 and value.shape[2] == 1):  # gray image
+            cv2.imwrite(filepath, value)
+        else:
+            cv2.imwrite(filepath, value)
+    elif hasattr(value, 'save'):  # PIL Image
+        value.save(filepath)
+    else:
+        try:
+            img_array = np.array(value)
+            cv2.imwrite(filepath, img_array)
+        except Exception as e:
+            print(f"can not save image {key}: {e}")
+    print(f"saved image: {filepath}")
+
 def preprocess_image(image):
     """
-    将图像从[H, W, C]格式转换为[C, H, W]格式
-    
-    Args:
-        image: 形状为[H, W, C]的numpy数组
-        
-    Returns:
-        形状为[C, H, W]的numpy数组
+    convert image to [C, H, W] format from [H, W, C] 
     """
-    # 确保图像是正确的类型
     image = np.array(image, dtype=np.float32)
-    
-    # 执行转置
     image_chw = image.transpose(2, 0, 1)
-    
-    # 可选：标准化图像
-    # image_chw = image_chw / 255.0  # 归一化到[0,1]范围
-    
+    image_chw = image_chw / 255.0  # normalize to [0,1]
     return image_chw
 def send_test_request(images, ee_state,is_reset=False):
-    """同步版本的send_test_request函数"""
-    # 定义内部异步函数
     async def _async_send_request(images, ee_state):
         uri = "ws://127.0.0.1:8000"
         async with websockets.connect(uri) as websocket:
@@ -50,16 +70,15 @@ def send_test_request(images, ee_state,is_reset=False):
                 return None
             else:
                 for key,value in images.items():
+                    if DEBUG:
+                        save_image(key,value)
                     observation[key] = np.array(preprocess_image(value),dtype=np.float32)
                 state = np.array(ee_state,dtype=np.float32)
-            # 创建观察数据，使用正确的键名
-            observation["observation.state"] = state
             
-
+            observation["observation.state"] = state
             packed_data = msgpack_numpy.packb(observation, use_bin_type=True)
             await websocket.send(packed_data)
             
-            # 接收响应
             response = await websocket.recv()
             try:
                 unpacked_response = msgpack_numpy.unpackb(response, raw=False)
@@ -73,23 +92,21 @@ def send_test_request(images, ee_state,is_reset=False):
                 gripper_open = action[-1]
                 gripper_state = np.ones(2)*0.04 if gripper_open >= 0.2 else np.zeros(2)
                 view_index = 0
-                # 解析响应...
+
                 return target_pos, target_euler, gripper_state, view_index
             except Exception as e:
                 logging.error(f"Failed to unpack response: {e}")
                 logging.error(f"Raw response: {response}")
                 return None
     
-    # 使用事件循环执行异步函数并获取结果
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
-        # 如果没有事件循环，创建一个新的
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     
     result = loop.run_until_complete(_async_send_request(images, ee_state))
-    return result  # 返回实际结果，而不是协程
+    return result  #retrun the result of the coroutine,not the coroutine itself
 if __name__ == "__main__":
     try:
         result = asyncio.run(send_test_request())

@@ -30,24 +30,7 @@ class BenchTaskConfigManager():
             config: base config from yaml file
         """
         config=kwargs["config"]
-        # default config
-        # self.config = dict(
-        #     task=dict(
-        #         ngrid=[10, 10],
-        #         n_distractor=1,
-        #         workspace=[-0.3, 0.3, -0.2, 0.2, 0.8, 1.5]
-        #     )
-        # )
-        # # load additional config from task_config.json
-        # if kwargs.get("config", None) is not None:
-        #     configs = kwargs.get("config")
-        # else:
-        #     config_path = os.path.join(os.getenv("VLABENCH_ROOT"), "configs/task_config.json")
-        #     with open(config_path, "r") as f:
-        #         configs = json.load(f)
 
-        #config = configs.get("default", {})#获取默认配置
-        #config.update(configs.get(find_key_by_value(name2config, task_name), None))#更新任务特定配置
         
         if config is None: 
             raise ValueError(f"Task {task_name} is invalid. Check the valid ones task_config.json file.")
@@ -143,10 +126,7 @@ class BenchTaskConfigManager():
         name = kwargs.get("specific_name", f"{target_entity}")
         xml_path = name2class_xml[target_entity][-1]
         if isinstance(xml_path, list):
-            #xml_path = random.choice(xml_path)
-            """
-            这个地方是消除随机性地方。
-            """
+            #xml_path = random.choice(xml_path) totally achieve the randomness
             if name == "apple":
                 xml_path = xml_path[1]
             elif name=="stove":
@@ -239,7 +219,7 @@ class BenchTaskConfigManager():
             if object==target_entity:
                 selected_position =random.choice(initial_pose)
                 if self.config["task"]["deterministic"]==True:
-                    print("生成固定target_entity")
+                    print("generate fixed target_entity")
                     object_config = self.get_entity_config(
                                                         target_entity,
                                                         position=selected_position,
@@ -247,16 +227,16 @@ class BenchTaskConfigManager():
                                                                          # if the randomness was set None, the object will randomly appear in the 4 positions in the desk.
                                                     )
                 else:
-                    print("生成随机target_entity")
+                    print("generate random target_entity")
                     if "ood_random_position" in self.config["task"] and self.config["task"]["ood_random_position"]:
                         if random.random() < 0.5:
-                            x_offset = random.uniform(-0.1, -0.05)  # 左侧范围
+                            x_offset = random.uniform(-0.1, -0.05)  # left range
                         else:
-                            x_offset = random.uniform(0.05, 0.1)    # 右侧范围
+                            x_offset = random.uniform(0.05, 0.1)    # right range
                         if random.random() < 0.5:
-                            y_offset = random.uniform(-0.1, -0.05)  # 左侧范围
+                            y_offset = random.uniform(-0.1, -0.05)  # left range
                         else:
-                            y_offset = random.uniform(0.05, 0.1)    # 右侧范围
+                            y_offset = random.uniform(0.05, 0.1)    # right range
                             
                         offsets=[x_offset, y_offset, 0]  
                         selected_position=[pos+offset for pos, offset in zip(selected_position, offsets)]
@@ -273,7 +253,7 @@ class BenchTaskConfigManager():
                 pdb.set_trace()
                 object_config = self.get_entity_config(object, position=[0.2, 0.17, 0.8],randomness=None)
             else:
-                print(f"生成随机物体{object}")
+                print(f"generate random object{object}")
                 object_config = self.get_entity_config(object, position=[-0.1+i*0.1, 0.2, 0.79],randomness=DEFAULT_RABDOMNESS)
             self.config["task"]["components"].append(object_config)
     

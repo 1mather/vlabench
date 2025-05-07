@@ -76,7 +76,7 @@ class LM4ManipBaseTask(composer.Task):
             self.ngrid = None
             self.workspace = [-0.3, 0.3, -0.2, 0.3, 0.75, 1.5]
         
-        self.build_from_config(eval, deterministic_config=episode_config)#调用此方法进行任务的实例构建
+        self.build_from_config(eval, deterministic_config=episode_config)
         self.reset_camera_views()
     
     def reset_camera_views(self, index=2):
@@ -274,8 +274,8 @@ class LM4ManipBaseTask(composer.Task):
         self.attach_entity(scene)
         self.scene = scene
     
-    #这里就是向环境中天际entity的代码
-    #this one is used load entity ferom the 
+
+
     def load_entity_from_config(self, config: dict, parent_node=None):
         entity_cls = config.get("class", None)
         assert entity_cls is not None, "entity class must be provided"
@@ -289,7 +289,7 @@ class LM4ManipBaseTask(composer.Task):
             config["parent_entity"] = parent_node
             self.random_ignored_entities.append(config["name"])
         entity = entity_cls(**config)
-        self.add_free_entity(entity)#添加到场景中
+        self.add_free_entity(entity)
         if entity.subentities is not None:
             for subentity_config in entity.subentities:
                 self.load_entity_from_config(subentity_config, parent_node=entity)

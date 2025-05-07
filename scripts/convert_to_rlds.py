@@ -75,21 +75,7 @@ def create_episode(file_path, save_dir, batch_size=10):
                 print(f"Episode saved to {save_path}")
 
 def build_tfds_builder(src_path, dest_path, task_name):
-    """
-    1.模板复制与定制化：
-        函数接收三个参数：源模板文件路径(src_path)、目标文件路径(dest_path)和任务名称(task_name)
-        读取一个通用模板文件(src_path)的内容
-        将内容中的"DemoBuilder"字符串替换为任务特定的名称
-        将修改后的内容写入新的文件(dest_path)
-    2.命名转换：
-        将任务名称从蛇形命名法(snake_case)转换为驼峰命名法(CamelCase)
-        例如：select_fruit → SelectFruit
-        这个转换后的名称用于替换模板中的"DemoBuilder"
-    3.文件管理：
-        检查源文件是否存在
-        创建目标文件所需的目录结构
-        输出操作完成的确认信息
-    """
+
     if not os.path.exists(src_path):
         print(f"Source file {src_path} does not exist.")
         return
@@ -128,7 +114,7 @@ if __name__ == "__main__":
     # # Define the save directories
     # builder_file = "VLABench/utils/rlds_builder.py"
     # if args.task is None:
-    #     tasks = os.listdir(args.save_dir)#listdir返回的是文件名列表
+    #     tasks = os.listdir(args.save_dir)#listdir
     #     for task in tasks:
     #         target_builder_dir = os.path.join(args.save_dir, task)
     #         build_tfds_builder(builder_file, os.path.join(target_builder_dir, f"{task}.py"), task)
