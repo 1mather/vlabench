@@ -47,7 +47,7 @@ class Evaluator:
                  tasks,
                  n_episodes,
                  episode_config=None,
-                 max_substeps=10,
+                 max_substeps=50,
                  tolerance=1e-2,
                  metrics=["success_rate"],
                  #metrics=['progress_score'],
@@ -174,10 +174,7 @@ class Evaluator:
                     y2 = y1 + frame_height
                     x1 = col * frame_width
                     x2 = x1 + frame_width
-                    
                     # 确保尺寸一致
-
-                    
                     # 复制到堆叠图像中
                     stacked_image[y1:y2, x1:x2] = frame               
                 # 写入堆叠后的帧
@@ -205,6 +202,7 @@ class Evaluator:
                 if isinstance(agent, RemoteAgentClient):
                     ee_state = observation["ee_state"]
                     ee_pos, ee_quat, gripper = ee_state[:3], ee_state[3:7], np.array([ee_state[7]])
+                    print(f"the current pose is {ee_pos}")
                     ee_euler = quat2euler(ee_quat)
                     ee_pos -= np.array([0, -0.4, 0.78])
                     print(ee_pos,ee_euler,gripper)
@@ -235,16 +233,17 @@ class Evaluator:
                 raise NotImplementedError(f"Control mode {agent.control_mode} is not implemented")    
             
 
-
-            for _ in range(self.max_substeps):
-                timestep = env.step(action)
-                if timestep.last():
-                    success=True
-                    break
-                current_qpos = np.array(env.task.robot.get_qpos(env.physics)).reshape(-1)
-                if np.max(current_qpos-np.array(action)[:7]) < self.tolerance \
-                    and np.min(current_qpos - np.array(action)[:7]) > -self.tolerance:
-                    break
+            if i >=2:
+                for _ in range(self.max_substeps):
+                    timestep = env.step(action)
+                    if timestep.last():
+                        success=True
+                        break
+                    current_qpos = np.array(env.task.robot.get_qpos(env.physics)).reshape(-1)
+                    if np.max(current_qpos-np.array(action)[:7]) < self.tolerance \
+                        and np.min(current_qpos - np.array(action)[:7]) > -self.tolerance:
+                        break
+            
             if success:
                 break
             #这里进行的操作是：

@@ -41,19 +41,19 @@ def load_env(task, robot="franka", config=None, time_limit=float('inf'), reset_w
     #3.加载机器人实体
     task = register.load_task(task)(task, robot, config=default_config, **kwargs)
     # Save the configuration for deterministic evaluation
-    if default_config is not None and "task" in default_config:
-        # Create a deep copy to avoid modifying the original config
-        import copy
-        config_to_save = copy.deepcopy(default_config)
-        # Save the configuration for later reference
-        import pickle
-        import os
-        # Ensure the directory exists
-        save_dir = os.path.join(os.getenv("VLABENCH_ROOT"), "configs")
-        os.makedirs(save_dir, exist_ok=True)
-        # Save the configuration
-        with open(os.path.join(save_dir, "default_config.pkl"), "wb") as f:
-            pickle.dump(config_to_save, f)
+    # if default_config is not None and "task" in default_config:
+    #     # Create a deep copy to avoid modifying the original config
+    #     import copy
+    #     config_to_save = copy.deepcopy(default_config)
+    #     # Save the configuration for later reference
+    #     import pickle
+    #     import os
+    #     # Ensure the directory exists
+    #     save_dir = os.path.join(os.getenv("VLABENCH_ROOT"), "configs")
+    #     os.makedirs(save_dir, exist_ok=True)
+    #     # Save the configuration
+    #     with open(os.path.join(save_dir, "default_config.pkl"), "wb") as f:
+    #         pickle.dump(config_to_save, f)
     #4.创建环境实例
     env = LM4ManipDMEnv(task=task, time_limit=time_limit, reset_wait_step=reset_wait_step)
     return env
